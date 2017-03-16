@@ -6,10 +6,10 @@ from Particles import *
 class Asteroid ():
   def __init__ (self, radius):
 
-    radii = 5 + int (random.random() * 5)
+    radii = 7 + int (random.random() * 5)
     r = []
     for _ in range (0, radii):
-      r.append (radius + random.random() * 5 - 2)
+      r.append (radius + random.random() * 7 - 4)
     r.append (r [0])
 
     s = []
@@ -28,12 +28,11 @@ class Asteroid ():
     else:
       initY = SCREEN_HEIGHT
 
-
     self.shape = Shape (s, Point (random.random () * SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, initY), 0)
     if initY <= 0:
-      self.velocity = Vector (random.random() / 2, PI + PI * random.random())
+      self.velocity = Vector (random.random() * 2, PI + PI * random.random())
     else:
-      self.velocity = Vector (random.random() / 2, PI * random.random())
+      self.velocity = Vector (random.random() * 2, PI * random.random())
 
     self.spin = (random.random() - .5) / 10
     self.thrust = 0
@@ -44,12 +43,10 @@ class Asteroid ():
 
   def update (self, e):
     self.shape.angle += self.spin
-
     self.shape.p.move (self.velocity)
 
     if self.collision != OBJECT_TYPE_NONE:
       for _ in  range (1, int (30 + random.random() * 10)):
-
         p = SmokeParticle (Point (self.shape.p.x, self.shape.p.y),
                            Vector (2 * random.random(), TAU * random.random()),
                            20 + random.random() * 10,

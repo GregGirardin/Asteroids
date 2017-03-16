@@ -32,10 +32,6 @@ class Vector ():
 
     return self
 
-  #def randomize (self):
-  #  return Vector (self.magnitude * (1 + random.random () / 10 - .1),
-  #                 self.direction * random.random() / 10 - .1)
-
   def dx (self): # x component of vector
     return self.magnitude * math.cos (self.direction)
 

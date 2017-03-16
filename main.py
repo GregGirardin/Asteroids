@@ -107,7 +107,7 @@ e.root.bind ("<Key>",   keyHandler)
 t = Tanker()  # test
 e.addObj(t)
 
-nextAlien = 1000200
+nextAlien = 0
 nextAsteroid = 0
 
 while True:
