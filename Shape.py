@@ -14,9 +14,9 @@ class Point():
     self.x += v.magnitude * math.cos (v.direction)
     self.y -= v.magnitude * math.sin (v.direction)
 
-  def translate (self, xpos, ypos, theta):
-    xr = self.x * math.cos (theta) - self.y * math.sin (theta) + xpos
-    yr = self.y * math.cos (theta) + self.x * math.sin (theta) + ypos
+  def translate (self, p, theta):
+    xr = self.x * math.cos (theta) - self.y * math.sin (theta) + p.x
+    yr = -self.y * math.cos (theta) - self.x * math.sin (theta) + p.y
     return Point (xr, yr)
 
 class Line ():
@@ -26,18 +26,18 @@ class Line ():
     self.p2 = p2
     self.color = color
 
-  def translate (self, xpos, ypos, theta):
-    p1r = self.p1.translate (xpos, ypos, theta)
-    p2r = self.p2.translate (xpos, ypos, theta)
+  def translate (self, p, theta):
+    p1r = self.p1.translate (p, theta)
+    p2r = self.p2.translate (p, theta)
     return Line (p1r, p2r, self.color)
 
 class Shape ():
   # a shape is a list of lines, x,y position, and a rotational angle
   def __init__ (self, s, p, a = 0):
-    # create a shape from a list of coordinates
-    # each pair of coords forms a vertex
-    # each pair of vertices forms a line
-    # worry about color later
+    # Create a shape from a list of coordinates
+    # Each pair of coords forms a vertex
+    # Each pair of vertices forms a line
+    # Worry about color later
     self.lines = []
     self.angle = a
     self.p = p # position is a Point
@@ -53,7 +53,7 @@ class Shape ():
     tlines = []
 
     for line in self.lines:
-      tlines.append (line.translate (self.p.x, self.p.y, self.angle))
+      tlines.append (line.translate (self.p, self.angle))
     return tlines
 
   def draw (self, canvas):

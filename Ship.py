@@ -29,13 +29,11 @@ class Ship ():
     self.shape.angle += self.spin
 
     if self.shape.angle < 0:
-      self.shape.angle += 2 * PI
-    elif self.shape.angle > 2 * PI:
-      self.shape.angle -= 2 * PI
+      self.shape.angle += TAU
+    elif self.shape.angle > TAU:
+      self.shape.angle -= TAU
 
-    i = Vector (self.thrust, self.shape.angle)
-
-    self.velocity.impulse (i)
+    self.velocity.impulse (Vector (self.thrust, self.shape.angle))
     self.shape.p.move (self.velocity)
 
     # bounce off walls
@@ -53,21 +51,23 @@ class Ship ():
 
     if self.thrust > 0:
       p = SmokeParticle (Point (self.shape.p.x, self.shape.p.y),
-                         Vector (3, self.shape.angle + PI + random.random() - .5),
-                         20 + random.random() * 10,
-                         self.thrust * 10 * (random.random() / 2 + .5))
+                         Vector (3, self.shape.angle + PI + random.random() / 2 - .25),
+                         10 + random.random() * 10,
+                         self.thrust * 30 * (random.random() / 2 + .5))
       e.addObj (p)
 
     if self.cannon > 0:
-      p = CanonParticle (self.shape.p, Vector (7, self.shape.angle), 120)
+      p = CanonParticle (Point (self.shape.p.x + 10 * math.cos (self.shape.angle),
+                                self.shape.p.y - 10 * math.sin (self.shape.angle)),
+                         Vector (7, self.shape.angle), 120)
       e.addObj (p)
       self.cannon -= 1
 
     if self.collision != OBJECT_TYPE_NONE:
       e.numShips -= 1
-      for _ in  range (1, int (40 + random.random() * 10)):
+      for _ in  range (1, int (30 + random.random() * 10)):
         p = SmokeParticle (Point (self.shape.p.x, self.shape.p.y),
-                           self.velocity.randomize(),
+                           Vector (2 * random.random(), TAU * random.random ()).impulse (self.velocity),
                            30 + random.random() * 20,
                            (random.random() / 2 + 3))
         e.addObj (p)

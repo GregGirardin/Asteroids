@@ -13,7 +13,6 @@ from Asteroid import *
 
 respawn = False
 
-
 class displayEngine ():
   def __init__(self):
     self.root = Tk()
@@ -62,26 +61,27 @@ class displayEngine ():
 
 MAX_SPIN = .3
 SPIN_DELTA = .025
-def leftHandler (event):
-  if s.spin > 0:
-    s.spin = 0
-  elif s.spin > -MAX_SPIN:
-    s.spin -= SPIN_DELTA
+MAX_THRUST = .08
 
-def rightHandler (event):
+def leftHandler (event):
   if s.spin < 0:
     s.spin = 0
   elif s.spin < MAX_SPIN:
     s.spin += SPIN_DELTA
 
+def rightHandler (event):
+  if s.spin > 0:
+    s.spin = 0
+  elif s.spin > -MAX_SPIN:
+    s.spin -= SPIN_DELTA
+
 def upHandler (event):
-  if s.thrust < .2:
+  if s.thrust < MAX_THRUST:
     s.thrust += .01
 
 def downHandler (event):
   s.thrust = 0
-  s.dx *= .8
-  s.dy *= .8
+  s.velocity.magnitude *= .8
 
 def keyHandler (event):
   global respawn
@@ -104,11 +104,11 @@ e.root.bind ("<Up>",    upHandler)
 e.root.bind ("<Down>",  downHandler)
 e.root.bind ("<Key>",   keyHandler)
 
-#t = Tanker()  # test
-#e.addObj(t)
+t = Tanker()  # test
+e.addObj(t)
 
 nextAlien = 1000200
-nextAsteroid = 1000400
+nextAsteroid = 0
 
 while True:
   e.update ()

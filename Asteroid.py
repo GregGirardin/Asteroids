@@ -24,20 +24,18 @@ class Asteroid ():
       theta += delTheta
 
     if random.random() < .5:
-      top = True
-    else:
-      top = False
-
-    if top:
       initY = 0
     else:
       initY = SCREEN_HEIGHT
 
-    self.shape = Shape (s,
-                        Point (random.random() * SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, initY),
-                        0)
-    self.velocity = Vector (random.random() / 2, 2 * PI * random.random())
-    self.spin = (random.random() - .5) / 5
+
+    self.shape = Shape (s, Point (random.random () * SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, initY), 0)
+    if initY <= 0:
+      self.velocity = Vector (random.random() / 2, PI + PI * random.random())
+    else:
+      self.velocity = Vector (random.random() / 2, PI * random.random())
+
+    self.spin = (random.random() - .5) / 10
     self.thrust = 0
     self.shape.angle = (random.random() - .5) / 8
     self.collision = OBJECT_TYPE_NONE
@@ -50,9 +48,10 @@ class Asteroid ():
     self.shape.p.move (self.velocity)
 
     if self.collision != OBJECT_TYPE_NONE:
-      for _ in  range (1, int(30 + random.random() * 10)):
-        p = SmokeParticle (self.shape.p,
-                           self.velocity.randomize(),
+      for _ in  range (1, int (30 + random.random() * 10)):
+
+        p = SmokeParticle (Point (self.shape.p.x, self.shape.p.y),
+                           Vector (2 * random.random(), TAU * random.random()),
                            20 + random.random() * 10,
                            (random.random() / 2 + 3))
         e.addObj (p)
@@ -61,15 +60,15 @@ class Asteroid ():
         vector = random.random() * 2 * PI
 
         a = Asteroid (self.collisionRadius / 2)
-        a.shape.p.x = self.shape.x + self.collisionRadius * math.cos (vector)
-        a.shape.p.y = self.shape.y + self.collisionRadius * math.sin (vector)
-        a.velocity = Vector (self.velocity.magnitude, self.velocity.direction + PI)
+        a.shape.p.x = self.shape.p.x + self.collisionRadius * math.cos (vector)
+        a.shape.p.y = self.shape.p.y + self.collisionRadius * math.sin (vector)
+        a.velocity = Vector (self.velocity.magnitude * 1.5, self.velocity.direction)
         e.addObj (a)
 
         a = Asteroid (self.collisionRadius / 2)
-        a.shape.p.x = self.shape.x + self.collisionRadius * math.cos (vector + PI)
-        a.shape.p.y = self.shape.y + self.collisionRadius * math.sin (vector + PI)
-        a.velocity = Vector (self.velocity.magnitude, self.velocity.direction + PI)
+        a.shape.p.x = self.shape.p.x + self.collisionRadius * math.cos (vector + PI)
+        a.shape.p.y = self.shape.p.y + self.collisionRadius * math.sin (vector + PI)
+        a.velocity = Vector (self.velocity.magnitude * 1.5, self.velocity.direction + PI)
         e.addObj (a)
       if self.collision == OBJECT_TYPE_CANNON:
         e.score += ASTEROID_POINTS
