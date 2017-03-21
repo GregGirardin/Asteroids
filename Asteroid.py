@@ -2,14 +2,15 @@ from Constants import *
 from Shape import *
 from Vector import *
 from Particles import *
+from Utils import *
 
-class Asteroid ():
+class Asteroid (WorldObject):
   def __init__ (self, radius):
 
-    radii = 7 + int (random.random() * 5)
+    radii = 8 + int (random.random() * 5)
     r = []
     for _ in range (0, radii):
-      r.append (radius + random.random() * 7 - 4)
+      r.append (radius + random.random() * 12 - 4)
     r.append (r [0])
 
     s = []
@@ -22,58 +23,48 @@ class Asteroid ():
                  r [i + 1] * math.sin (theta + delTheta),
                  0))
       theta += delTheta
+    self.shape = Shape (s)
 
     if random.random() < .5:
-      initY = 0
+      v = Vector (random.uniform (.2, 2),random.uniform (PI + PI * .2, PI + PI * .8))
+      initY = -SCREEN_BUFFER + 1
     else:
-      initY = SCREEN_HEIGHT
+      v = Vector (random.uniform (.2, 2), random.uniform (PI * .2, PI * .8))
+      initY = SCREEN_HEIGHT + SCREEN_BUFFER - 1
 
-    self.shape = Shape (s, Point (random.random () * SCREEN_WIDTH / 2 + SCREEN_WIDTH / 4, initY), 0)
-    if initY <= 0:
-      self.velocity = Vector (random.random() * 2, PI + PI * random.random())
-    else:
-      self.velocity = Vector (random.random() * 2, PI * random.random())
-
-    self.spin = (random.random() - .5) / 10
-    self.thrust = 0
-    self.shape.angle = (random.random() - .5) / 8
     self.collision = OBJECT_TYPE_NONE
-    self.collisionRadius = radius
-    self.type = OBJECT_TYPE_ASTEROID
+    WorldObject.__init__ (self, OBJECT_TYPE_ASTEROID,
+                          Point (random.randrange (SCREEN_WIDTH * .1, SCREEN_WIDTH * .8), initY),
+                          0, v, radius)
+    self.spin = (random.random() - .5) / 10
 
   def update (self, e):
-    self.shape.angle += self.spin
-    self.shape.p.move (self.velocity)
+    WorldObject.update (self, e)
 
     if self.collision != OBJECT_TYPE_NONE:
       for _ in  range (1, int (30 + random.random() * 10)):
-        p = SmokeParticle (Point (self.shape.p.x, self.shape.p.y),
-                           Vector (2 * random.random(), TAU * random.random()),
-                           20 + random.random() * 10,
+        p = SmokeParticle (Point (self.p.x, self.p.y),
+                           Vector (2 * random.random(), random.uniform(0, TAU)),
+                           random.randrange (20, 30),
                            (random.random() / 2 + 3))
         e.addObj (p)
 
       if self.collisionRadius > 15:
         vector = random.random() * 2 * PI
+        for v in (0, PI):
+          a = Asteroid (self.collisionRadius / 2)
+          a.p.x = self.p.x + self.collisionRadius * math.cos (vector + v)
+          a.p.y = self.p.y + self.collisionRadius * math.sin (vector + v)
+          a.velocity = Vector (self.v.magnitude * 1.5, self.v.direction + v)
+          e.addObj (a)
 
-        a = Asteroid (self.collisionRadius / 2)
-        a.shape.p.x = self.shape.p.x + self.collisionRadius * math.cos (vector)
-        a.shape.p.y = self.shape.p.y + self.collisionRadius * math.sin (vector)
-        a.velocity = Vector (self.velocity.magnitude * 1.5, self.velocity.direction)
-        e.addObj (a)
-
-        a = Asteroid (self.collisionRadius / 2)
-        a.shape.p.x = self.shape.p.x + self.collisionRadius * math.cos (vector + PI)
-        a.shape.p.y = self.shape.p.y + self.collisionRadius * math.sin (vector + PI)
-        a.velocity = Vector (self.velocity.magnitude * 1.5, self.velocity.direction + PI)
-        e.addObj (a)
       if self.collision == OBJECT_TYPE_CANNON:
         e.score += ASTEROID_POINTS
 
-    if self.shape.offScreen() or self.collision != OBJECT_TYPE_NONE:
+    if self.offScreen() or self.collision != OBJECT_TYPE_NONE:
       return False
 
     return True
 
-  def draw (self, canvas):
-    self.shape.draw (canvas)
+  def draw (self, canvas, p, a):
+    self.shape.draw (canvas, p, a)

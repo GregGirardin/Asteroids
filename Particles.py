@@ -1,50 +1,46 @@
 from Constants import *
 import math
+from Utils import *
 from Shape import *
 
-class SmokeParticle ():
+class SmokeParticle (WorldObject):
   def __init__ (self, p, v, ttl, size):
-    self.velocity = v
     self.ttl = ttl
-    self.spin = random.random() * 2 - 1
     s = [(-size,-size, size, size, None),
          (-size, size, size,-size, None)]
-    self.shape = Shape (s, p)
-    self.type = OBJECT_TYPE_NONE
+    self.shape = Shape (s)
+    WorldObject.__init__ (self, OBJECT_TYPE_NONE, p, 0, v, 0)
 
   def update (self, e):
-    self.shape.p.move (self.velocity)
-    self.shape.angle += self.spin
+    WorldObject.update (self, e)
+
     if self.ttl > 0:
       self.ttl -= 1
       return True
     else:
       return False
 
-  def draw (self, canvas):
-    self.shape.draw (canvas)
+  def draw (self, canvas, p, a):
+    self.shape.draw (canvas, p, a)
 
-class CanonParticle ():
+class CanonParticle (WorldObject):
   def __init__ (self, p, v, ttl):
-    self.velocity = v
     self.ttl = ttl
-    self.spin = 0
-    self.collisionRadius = 0
     size = 1
     s = [(-size,-size, size, size, None),
          (-size, size, size,-size, None)]
-    self.shape = Shape (s, p)
+    self.shape = Shape (s)
     self.collision = OBJECT_TYPE_NONE
-    self.type = OBJECT_TYPE_CANNON
+    WorldObject.__init__ (self, OBJECT_TYPE_CANNON, p, 0, v, 0)
 
   def update (self, e):
-    self.shape.p.move (self.velocity)
-    self.shape.angle += self.spin
+    WorldObject.update (self, e)
+
     if self.ttl > 0 and self.collision == OBJECT_TYPE_NONE:
       self.ttl -= 1
       return True
     else:
       return False
 
-  def draw (self, canvas):
-    self.shape.draw (canvas)
+  def draw (self, canvas, p, a):
+    self.shape.draw (canvas, p, a)

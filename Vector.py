@@ -2,8 +2,10 @@ from Constants import *
 from Shape import *
 import math, random
 
-########################
+#
 # 0 is right, PI/2 is up, PI is left, -PI/2 is down
+#
+
 class Vector ():
   def __init__ (self, m, d):
     self.magnitude = m

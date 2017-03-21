@@ -10,6 +10,7 @@ from Particles import *
 from Aliens import *
 from Vector import *
 from Asteroid import *
+from Utils import *
 
 respawn = False
 
@@ -25,13 +26,13 @@ class displayEngine ():
   def update (self):
     # collision detection (fix wasteful checks)
     for obj1 in self.objects:
-        for obj2 in self.objects:
-          if obj2 is not obj1:
-            if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
-              rad = obj1.collisionRadius + obj2.collisionRadius
-              if obj1.shape.p.distance (obj2.shape.p) < rad:
-                obj1.collision = obj2.type
-                obj2.collision = obj1.type
+      for obj2 in self.objects:
+        if obj2 is not obj1:
+          if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
+            rad = obj1.collisionRadius + obj2.collisionRadius
+            if obj1.p.distanceTo (obj2.p) < rad:
+              obj1.collision = obj2.type
+              obj2.collision = obj1.type
 
     # update objects
     for obj in self.objects:
@@ -44,7 +45,7 @@ class displayEngine ():
   def draw (self, ship):
     self.canvas.delete (ALL)
     for obj in self.objects:
-      obj.draw (self.canvas)
+      obj.draw (self.canvas, obj.p, obj.a)
 
     # game status
     # display the remaining ships
@@ -56,12 +57,10 @@ class displayEngine ():
     self.canvas.create_text (100, 10, text = score)
     self.canvas.create_rectangle (200, 5, 200 + 200, 7)
     self.canvas.create_rectangle (200, 10, 200 + 200 * ship.fuel / 100, 15)
+    self.canvas.create_rectangle (200, 20, 200 + 200 * ship.rounds / 100, 15)
 
     self.root.update()
 
-MAX_SPIN = .3
-SPIN_DELTA = .025
-MAX_THRUST = .08
 
 def leftHandler (event):
   if s.spin < 0:
@@ -76,12 +75,11 @@ def rightHandler (event):
     s.spin -= SPIN_DELTA
 
 def upHandler (event):
-  if s.thrust < MAX_THRUST:
-    s.thrust += .01
+  s.accel += .01
 
 def downHandler (event):
-  s.thrust = 0
-  s.velocity.magnitude *= .8
+  s.accel = 0
+  s.v.magnitude *= .8
 
 def keyHandler (event):
   global respawn
@@ -90,7 +88,7 @@ def keyHandler (event):
     if s.collision > 0:
       respawn = True
     else:
-      s.cannon = s.numRounds
+      s.cannon = s.numRoundsPF
       if e.score:
         e.score -= 1
 
