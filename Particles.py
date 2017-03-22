@@ -10,6 +10,10 @@ class SmokeParticle (WorldObject):
          (-size, size, size,-size, None)]
     self.shape = Shape (s)
     WorldObject.__init__ (self, OBJECT_TYPE_NONE, p, 0, v, 0)
+    if random.random() < .5:
+      self.spin = 5
+    else:
+      self.spin = -5
 
   def update (self, e):
     WorldObject.update (self, e)

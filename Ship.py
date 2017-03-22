@@ -15,7 +15,7 @@ class Ship (WorldObject):
     self.collision = OBJECT_TYPE_NONE
     self.numRoundsPF = 1
     self.rounds = 100.0
-    self.fuel = 10.0
+    self.fuel = 100.0
     WorldObject.__init__ (self,
                           OBJECT_TYPE_SHIP,
                           Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT / 2),
@@ -59,14 +59,14 @@ class Ship (WorldObject):
                          Vector (7, self.a), 120)
       e.addObj (p)
       self.cannon -= 1
-      self.rounds -= .2
+      self.rounds -= .5
     else:
       self.cannon = 0
 
     # collisions
     if self.collision == OBJECT_TYPE_TANKER:
       self.fuel = 100.0
-      self.numRounds = 1000
+      self.rounds = 100.0
       self.collision = OBJECT_TYPE_NONE
     elif self.collision != OBJECT_TYPE_NONE:
       e.numShips -= 1

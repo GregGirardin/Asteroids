@@ -12,7 +12,7 @@ class WorldObject ():
     if not p:
       p = Point (SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2)
     self.p = p # position
-    self.a = a
+    self.a = a # angle
     self.type = type
     self.accel = 0.0
     self.collisionRadius = collisionRadius
@@ -33,3 +33,13 @@ class WorldObject ():
 
     self.v.impulse (Vector (self.accel, self.a))
     self.p.move (self.v)
+
+# if you're facing dir and want to go goalDir, return the delta. -PI to PI
+def angleTo (dir, goalDir):
+  dif = goalDir - dir
+  if dif > PI:
+    dif -= TAU
+  elif dif < -PI:
+    dif += TAU
+
+  return dif

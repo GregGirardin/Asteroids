@@ -23,7 +23,7 @@ class Tanker (WorldObject, Pilot):
          (-10, 10 ,-5, 0, None)]
 
     # start from the right side, going left.
-    p = Point (SCREEN_WIDTH, random.random () * SCREEN_HEIGHT / 2 + SCREEN_HEIGHT / 4)
+    p = Point (SCREEN_WIDTH + SCREEN_BUFFER / 2, random.random() * SCREEN_HEIGHT)
     self.shape = Shape (s)
     self.collision = OBJECT_TYPE_NONE
     self.refueled = False
@@ -34,11 +34,11 @@ class Tanker (WorldObject, Pilot):
 
     hList = [
       Heuristic ("Init", HEUR_GOTO, "Wait",
-                 HeuristicGoto (Point (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), APPROACH_SLOW)),
+                 HeuristicGoto (Point (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), OBJECT_DIST_NEAR, 1000)),
       Heuristic ("Wait", HEUR_WAIT, "Depart",
-                 HeuristicWait (Point (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), 200)),
-      Heuristic ("Depart", HEUR_WAIT, None,
-                 HeuristicGoto (Point (SCREEN_WIDTH + 100, SCREEN_HEIGHT / 2), APPROACH_FAST))
+                 HeuristicWait (Point (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), 500)),
+      Heuristic ("Depart", HEUR_GOTO, None,
+                 HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2), OBJECT_DIST_NEAR, 0))
       ]
 
     Pilot.__init__ (self, hList)
@@ -51,7 +51,7 @@ class Tanker (WorldObject, Pilot):
     if self.accel > 0:
       p = SmokeParticle (Point (self.p.x, self.p.y),
                          Vector (2, self.a + PI + random.uniform (-.25, .25)),
-                         5 + random.random() * 5,
+                         random.uniform (5, 10),
                          self.accel * 30 * random.uniform (.5, 1))
       e.addObj (p)
 
@@ -61,8 +61,8 @@ class Tanker (WorldObject, Pilot):
       for _ in  range (1, int (50 + random.uniform (0, 10))):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (random.random(), random.uniform (0, TAU)).impulse (self.v),
-                           30 + random.uniform(0, 20),
-                           (random.uniform (0, .5) + 3))
+                           random.uniform (30, 50),
+                           (random.uniform (3, 3.5)))
         e.addObj (p)
 
     if self.offScreen() or self.collision != OBJECT_TYPE_NONE:

@@ -2,6 +2,7 @@ from Constants import *
 from Shape import *
 import math, random
 
+
 #
 # 0 is right, PI/2 is up, PI is left, -PI/2 is down
 #
@@ -39,3 +40,26 @@ class Vector ():
 
   def dy (self): # y component of vector
     return self.magnitude * math.sin (self.direction)
+
+
+# returns a vector that would connect 'f' to 't'
+def vectorDiff (f, t):
+  dx = t.dx() - f.dx()
+  dy = f.dy() - t.dy()
+
+  m = math.sqrt (dx ** 2 + dy ** 2)
+
+  if m < EFFECTIVE_ZERO:
+    d = 0
+  else:
+    if math.fabs (dx) < EFFECTIVE_ZERO:
+      if dy > 0:
+        d = -PI / 2
+      else:
+        d = PI / 2
+    elif dx > 0:
+      d = math.atan (-dy / dx)
+    else:
+      d = PI + math.atan (-dy / dx)
+
+  return Vector (m, d)

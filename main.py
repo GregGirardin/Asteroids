@@ -102,16 +102,20 @@ e.root.bind ("<Up>",    upHandler)
 e.root.bind ("<Down>",  downHandler)
 e.root.bind ("<Key>",   keyHandler)
 
-t = Tanker()  # test
-e.addObj(t)
-
 nextAlien = 0
 nextAsteroid = 0
+nextTanker = 100
 
 while True:
   e.update ()
   e.draw (s)
   time.sleep (.02)
+
+  nextTanker -= 1
+  if nextTanker < 0:
+    t = Tanker()
+    e.addObj(t)
+    nextTanker = 1000 + random.random() * 500
 
   nextAsteroid -= 1
   if nextAsteroid < 0:
@@ -121,7 +125,7 @@ while True:
 
   nextAlien -= 1
   if nextAlien < 0:
-    nextAlien = 100 + random.random() * 100
+    nextAlien = 200 + random.random() * 200
     if random.random() < .25:
       a = SmallAlien()
     else:

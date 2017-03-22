@@ -1,6 +1,7 @@
 import random, math
 from Vector import *
 
+
 class Point():
   def __init__ (self, x, y):
     self.x = x
@@ -10,10 +11,25 @@ class Point():
      return math.sqrt ((self.x - p.x) ** 2 + (self.y - p.y) ** 2)
 
   def directionTo (self, p): # p is another point
-    dx = p.x - self.x
-    dy = p.y - self.y
+    cx = p.x - self.x
+    cy = p.y - self.y
 
-    return 0
+    magnitude = math.sqrt (cx ** 2 + cy ** 2)
+
+    if magnitude < EFFECTIVE_ZERO:
+      direction = 0
+    else:
+      if math.fabs (cx) < EFFECTIVE_ZERO:
+        if cy > 0:
+          direction = -PI / 2
+        else:
+          direction = PI / 2
+      elif cx > 0:
+        direction = math.atan (-cy / cx)
+      else:
+        direction = PI + math.atan (-cy / cx)
+
+    return direction
 
   def move (self, v): # v is a Vector PI/2 is up (-y)
     self.x += v.magnitude * math.cos (v.direction)
