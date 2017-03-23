@@ -74,7 +74,7 @@ class Pilot ():
     distToTarget = self.p.distanceTo (target) # determine ideal speed based on distance
     targetSpeed = 0
     if distToTarget > OBJECT_DIST_FAR:
-      targetSpeed = SPEED_FAST
+      targetSpeed = SPEED_HI
     elif distToTarget > OBJECT_DIST_MED:
       if h.distance == OBJECT_DIST_FAR:
         h.targetReached = True
@@ -88,14 +88,30 @@ class Pilot ():
 
     dirToTarget = self.p.directionTo (target)
     targetVector = Vector (targetSpeed, dirToTarget) # Ideal velocity vector from 'p' to target
-    correctionVec = vectorDiff (self.v, targetVector) # vector to take us towards our targetVector
+    correctionVec = vectorDiff (self.v, targetVector) # vector to make our velocity approach targetVector
 
-    da = angleTo (self.a, correctionVec.direction)
+    # if we're pretty close to targetVector, just go straight
+    # continuous adjustment causes erratic (thougth predictable) behavior.
+    desiredVec = targetVector if correctionVec.magnitude < SPEED_SLOW and targetVector.magnitude > SPEED_MED \
+      else correctionVec
+
+    da = angleTo (self.a, desiredVec.direction)
+
     self.spin = da / 20
-    if correctionVec.magnitude > self.v.magnitude:
+    dp = dot (self.v, desiredVec) # component of velocity in the direction of correctionVec
+    if dp < SPEED_HI:
       self.accel = THRUST_HI
+    elif dp < SPEED_MED:
+      self.accel = THRUST_LOW
     else:
       self.accel = 0
+      self.spin = 0
+
+    if 1:
+      self.tv = targetVector
+      self.cv = desiredVec
+      self.target = target
+
 
     if h.targetReached == True:
       h.duration -= 1
@@ -103,9 +119,10 @@ class Pilot ():
         return True
     return False
 
-
   def handleWait (self, e):
     h = self.currentH.heuristic
+    self.accel = 0
+    self.spin = 0
 
     h.duration -= 1
     if h.duration < 0:

@@ -35,12 +35,16 @@ class Vector ():
 
     return self
 
+
   def dx (self): # x component of vector
     return self.magnitude * math.cos (self.direction)
 
   def dy (self): # y component of vector
     return self.magnitude * math.sin (self.direction)
 
+def dot (v1, v2):
+  theta = math.fabs (v1.direction - v2.direction)
+  return v1.magnitude * math.cos (theta)
 
 # returns a vector that would connect 'f' to 't'
 def vectorDiff (f, t):

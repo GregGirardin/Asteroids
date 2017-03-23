@@ -73,8 +73,8 @@ class Ship (WorldObject):
       for _ in  range (1, int (30 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (2 * random.random(), TAU * random.random ()).impulse (self.v),
-                           30 + random.random() * 20,
-                           (random.random() / 2 + 3))
+                           random.uniform (20, 50),
+                           random.uniform (3, 3.5))
         e.addObj (p)
       return False
     return True

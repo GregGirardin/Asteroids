@@ -104,7 +104,7 @@ e.root.bind ("<Key>",   keyHandler)
 
 nextAlien = 0
 nextAsteroid = 0
-nextTanker = 100
+nextTanker = 0
 
 while True:
   e.update ()
@@ -115,7 +115,7 @@ while True:
   if nextTanker < 0:
     t = Tanker()
     e.addObj(t)
-    nextTanker = 1000 + random.random() * 500
+    nextTanker = 2000 + random.random() * 500
 
   nextAsteroid -= 1
   if nextAsteroid < 0:
@@ -125,7 +125,7 @@ while True:
 
   nextAlien -= 1
   if nextAlien < 0:
-    nextAlien = 200 + random.random() * 200
+    nextAlien = 300 + random.random() * 200
     if random.random() < .25:
       a = SmallAlien()
     else:
