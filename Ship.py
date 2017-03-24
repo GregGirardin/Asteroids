@@ -3,6 +3,7 @@ from Shape import *
 from Vector import *
 from Utils import *
 from Particles import *
+from Tkinter import *
 
 class Ship (WorldObject):
   def __init__ (self):
@@ -32,7 +33,7 @@ class Ship (WorldObject):
         self.fuel = 0
         if self.accel > 0:
           self.accel = THRUST_LOW
-      self.fuel -= self.accel
+      self.fuel -= self.accel * 2
 
     # bounce off walls
     if self.p.x < 0:
@@ -81,3 +82,9 @@ class Ship (WorldObject):
 
   def draw (self, canvas, p, a):
     self.shape.draw (canvas, p, a)
+
+    canvas.create_rectangle (100,  5, 100 + 200, 7)
+    fill = "red" if self.fuel < 20.0 else "black"
+    canvas.create_rectangle (100, 10, 100 + 200 * self.fuel / 100, 15, fill=fill)
+    fill = "red" if self.rounds < 20.0 else "black"
+    canvas.create_rectangle (100, 20, 100 + 200 * self.rounds / 100, 25, fill=fill)

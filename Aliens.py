@@ -16,18 +16,38 @@ class SmallAlien (WorldObject, Pilot):
     self.shape = Shape (s)
     self.collision = OBJECT_TYPE_NONE
 
-    hList = [
-      Heuristic ("Init", HEUR_GOTO, "2",
-                 HeuristicGoto (Point (SCREEN_WIDTH * .2, SCREEN_HEIGHT * random.random()), OBJECT_DIST_FAR, 0)),
-      Heuristic ("2", HEUR_GOTO, "3",
-                 HeuristicGoto (Point (SCREEN_WIDTH * .5, SCREEN_HEIGHT * random.random()), OBJECT_DIST_FAR, 0)),
-      Heuristic ("3", HEUR_GOTO, "4",
-                 HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * random.random()), OBJECT_DIST_FAR, 0)),
-      Heuristic ("4", HEUR_GOTO, None,
-                 HeuristicGoto (Point (SCREEN_WIDTH, SCREEN_HEIGHT * random.random()), OBJECT_DIST_FAR, 0))
-      ]
+    if random.random () < .5:
+      hList = [ # this jerk flys around forever
+        Heuristic ("1", HEUR_GOTO, "2",
+                   HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .25),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+        Heuristic ("2", HEUR_GOTO, "3",
+                   HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .25),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+        Heuristic ("3", HEUR_GOTO, "4",
+                   HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .75),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+        Heuristic ("4", HEUR_GOTO, "1",
+                   HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .75),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST))
+        ]
+    else:
+      hList = [
+        Heuristic ("Init", HEUR_GOTO, "2",
+                   HeuristicGoto (Point (SCREEN_WIDTH * .25, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+        Heuristic ("2", HEUR_GOTO, "3",
+                   HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+        Heuristic ("3", HEUR_GOTO, "4",
+                   HeuristicGoto (Point (SCREEN_WIDTH * .75, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+        Heuristic ("4", HEUR_GOTO, None,
+                   HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                  OBJECT_DIST_FAR, 0, APPROACH_TYPE_FAST))
+        ]
 
-    p = Point (0, SCREEN_HEIGHT * random.random())
+    p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
     Pilot.__init__ (self, hList)
     WorldObject.__init__ (self, OBJECT_TYPE_ALIEN, p, (random.random() - .5) / 4, None, 5)
 
@@ -53,7 +73,7 @@ class SmallAlien (WorldObject, Pilot):
   def draw (self, canvas, p, a):
     self.shape.draw (canvas, p, a)
 
-    if 1: # debug vectors
+    if debugVectors:
       canvas.create_line (p.x, p.y, p.x + self.v.dx()  * 20, p.y - self.v.dy()  * 20, arrow=tk.LAST, fill="green")
       canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y - self.tv.dy() * 20, arrow=tk.LAST)
       canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y - self.cv.dy() * 20, arrow=tk.LAST, fill="red")
@@ -72,11 +92,13 @@ class BigAlien (WorldObject, Pilot):
 
     hList = [
       Heuristic ("Init", HEUR_GOTO, "Midway",
-                 HeuristicGoto (Point (SCREEN_WIDTH / 2, SCREEN_HEIGHT * random.random()), OBJECT_DIST_FAR, 0)),
+                 HeuristicGoto (Point (SCREEN_WIDTH / 2, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                OBJECT_DIST_NEAR, 0, APPROACH_TYPE_FAST)),
       Heuristic ("Midway", HEUR_GOTO, None,
-                 HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT * random.random()), OBJECT_DIST_FAR, 0))
+                 HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST))
       ]
-    p = Point (0, SCREEN_HEIGHT * random.random())
+    p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
 
     Pilot.__init__ (self, hList)
     WorldObject.__init__ (self, OBJECT_TYPE_ALIEN, p, (random.random() - .5) / 4, None, 12)
@@ -103,7 +125,7 @@ class BigAlien (WorldObject, Pilot):
   def draw (self, canvas, p, a):
     self.shape.draw (canvas, p, a)
 
-    if 1:
+    if debugVectors:
       canvas.create_line (p.x, p.y, p.x + self.v.dx()  * 20, p.y - self.v.dy()  * 20, arrow=tk.LAST, fill="green")
       canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y - self.tv.dy() * 20, arrow=tk.LAST)
       canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y - self.cv.dy() * 20, arrow=tk.LAST, fill="red")

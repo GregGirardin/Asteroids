@@ -43,3 +43,11 @@ def angleTo (dir, goalDir):
     dif += TAU
 
   return dif
+
+
+def angleNorm (dir):
+  if dir > PI:
+    dir -= TAU
+  elif dir < -PI:
+    dir += TAU
+  return dir

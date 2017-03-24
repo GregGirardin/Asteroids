@@ -35,7 +35,6 @@ class Vector ():
 
     return self
 
-
   def dx (self): # x component of vector
     return self.magnitude * math.cos (self.direction)
 

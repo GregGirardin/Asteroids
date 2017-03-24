@@ -27,22 +27,25 @@ from Shape import *
 from Ship import *
 from Vector import *
 
+debugVectors = False
+
 class HeuristicGoto ():
-  def __init__ (self, target, distance, duration):
+  def __init__ (self, target, distance, duration, at = APPROACH_TYPE_SLOW):
     self.target = target
     self.distance = distance # close do we need to get for success
     self.duration = duration
     self.targetReached = False
+    self.approachType = at
 
 class HeuristicWait ():
-  def __init__ (self, target, duration):
-    self.target = target # point to wait at
+  def __init__ (self, duration):
     self.duration = duration
 
 class HeuristicAttack ():
   def __init__ (self, target, at):
     self.target = target # point to wait at
 
+####
 
 class Heuristic ():
   def __init__ (self, id, type, next, heuristic):
@@ -69,53 +72,78 @@ class Pilot ():
 
   def handleGoto (self, e):
     h = self.currentH.heuristic
+
     target = h.target # target point
 
-    distToTarget = self.p.distanceTo (target) # determine ideal speed based on distance
-    targetSpeed = 0
-    if distToTarget > OBJECT_DIST_FAR:
-      targetSpeed = SPEED_HI
-    elif distToTarget > OBJECT_DIST_MED:
-      if h.distance == OBJECT_DIST_FAR:
+    if h.targetReached: # try to turn around and top
+      if self.v.magnitude > SPEED_SLOW / 6:
+        # turn around
+        targetDir = angleNorm (self.v.direction + PI)
+        dirTo = angleTo (self.a, targetDir)
+        if math.fabs (dirTo) > .1:
+          self.accel = 0
+          self.spin = dirTo / 20
+        else:
+          self.accel = THRUST_HI
+          self.spin = 0
+      else:
+        self.accel = 0
+        self.spin = 0
+        dirTo = self.v.direction
+      targetVector = Vector (self.accel, dirTo)
+      desiredVec = Vector (0, 0)
+    else: # haven't reached the target yet
+      distToTarget = self.p.distanceTo (target) # determine ideal speed based on distance
+      targetSpeed = 0
+
+      if distToTarget > OBJECT_DIST_FAR:
+        targetSpeed = SPEED_HI
+      elif distToTarget > OBJECT_DIST_MED:
+        if h.distance == OBJECT_DIST_FAR:
+          h.targetReached = True
+        targetSpeed = SPEED_MED
+      elif distToTarget > OBJECT_DIST_NEAR:
+        if h.distance == OBJECT_DIST_MED:
+          h.targetReached = True
+        targetSpeed = SPEED_SLOW
+      else:
         h.targetReached = True
-      targetSpeed = SPEED_MED
-    elif distToTarget > OBJECT_DIST_NEAR:
-      if h.distance == OBJECT_DIST_MED:
-        h.targetReached = True
-      targetSpeed = SPEED_SLOW
-    else:
-      h.targetReached = True
+      if h.approachType == APPROACH_TYPE_FAST:
+        targetSpeed = SPEED_HI
 
-    dirToTarget = self.p.directionTo (target)
-    targetVector = Vector (targetSpeed, dirToTarget) # Ideal velocity vector from 'p' to target
-    correctionVec = vectorDiff (self.v, targetVector) # vector to make our velocity approach targetVector
+      dirToTarget = self.p.directionTo (target)
+      targetVector = Vector (targetSpeed, dirToTarget) # Ideal velocity vector from 'p' to target
+      correctionVec = vectorDiff (self.v, targetVector) # vector to make our velocity approach targetVector
 
-    # if we're pretty close to targetVector, just go straight
-    # continuous adjustment causes erratic (thougth predictable) behavior.
-    desiredVec = targetVector if correctionVec.magnitude < SPEED_SLOW and targetVector.magnitude > SPEED_MED \
-      else correctionVec
+      # if we're pretty close to targetVector, just go straight
+      # continuous adjustment causes erratic behavior.
+      #if h.targetReached and h.approachType == APPROACH_TYPE_SLOW:
+      # if self.v.magnitude < SPEED_SLOW
+      #  desiredVec = Vector (self.v.magnitude, self.v.direction + PI)
+      #else:
+      desiredVec = targetVector if correctionVec.magnitude < targetVector.magnitude / 3 else correctionVec
 
-    da = angleTo (self.a, desiredVec.direction)
+      da = angleTo (self.a, desiredVec.direction)
 
-    self.spin = da / 20
-    dp = dot (self.v, desiredVec) # component of velocity in the direction of correctionVec
-    if dp < SPEED_HI:
-      self.accel = THRUST_HI
-    elif dp < SPEED_MED:
-      self.accel = THRUST_LOW
-    else:
-      self.accel = 0
-      self.spin = 0
+      self.spin = da / 20
+      dp = dot (self.v, desiredVec) # component of velocity in the direction of correctionVec
+      if dp < SPEED_HI:
+        self.accel = THRUST_HI
+      elif dp < SPEED_MED:
+        self.accel = THRUST_LOW
+      else:
+        self.accel = 0
+        self.spin = 0
 
-    if 1:
+    if debugVectors:
       self.tv = targetVector
       self.cv = desiredVec
       self.target = target
 
-
     if h.targetReached == True:
       h.duration -= 1
       if h.duration < 0:
+        h.targetReached = False # in cause we use this one again
         return True
     return False
 
