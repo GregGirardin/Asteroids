@@ -34,6 +34,40 @@ class WorldObject ():
     self.v.impulse (Vector (self.accel, self.a))
     self.p.move (self.v)
 
+# Could try to make this a WorldObject if that's cleaner
+class Event ():
+  def __init__(self, msg, dur, action):
+    self.msg = msg
+    self.dur = dur
+    self.action = action # callback
+
+class gameEvents ():
+
+  def __init__(self):
+    self.eventList = []
+
+  def newEvent (self, msg, dur, action):
+    ev = Event (msg, dur, action)
+    self.eventList.append (ev)
+
+  def update (self):
+    if len (self.eventList) > 0:
+      e = self.eventList [0]
+      e.dur -= 1
+      if e.dur < 0:
+        if e.action:
+          e.action()
+        del self.eventList [0]
+
+    return True # Event object is always here
+
+  def draw (self, e):
+    if len (self.eventList) > 0:
+      ev = self.eventList [0]
+      if ev.msg:
+        e.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = ev.msg)
+
+
 # if you're facing dir and want to go goalDir, return the delta. -PI to PI
 def angleTo (dir, goalDir):
   dif = goalDir - dir

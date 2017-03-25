@@ -24,7 +24,7 @@ class Tanker (WorldObject, Pilot):
          (-10, 10 ,-5, 0, None)]
 
     # start from the right side, going left.
-    p = Point (SCREEN_WIDTH + SCREEN_BUFFER / 2, random.random() * SCREEN_HEIGHT)
+    p = Point (SCREEN_WIDTH + SCREEN_BUFFER / 2, random.uniform(SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75))
     self.shape = Shape (s)
     self.collision = OBJECT_TYPE_NONE
     self.rendesvousComplete = False
@@ -35,11 +35,9 @@ class Tanker (WorldObject, Pilot):
       Heuristic ("Init", HEUR_GOTO, "Wait",
                  HeuristicGoto (Point (SCREEN_WIDTH * random.uniform (.5, .8), SCREEN_HEIGHT * random.uniform (.2, .8)),
                                 OBJECT_DIST_NEAR, 200, APPROACH_TYPE_SLOW)),
-      Heuristic ("Wait", HEUR_WAIT, "Depart",
-                 HeuristicWait (500)),
+      Heuristic ("Wait", HEUR_WAIT, "Depart", HeuristicWait (500)),
       Heuristic ("Depart", HEUR_GOTO, None,
-                 HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2),
-                                OBJECT_DIST_NEAR, 0, APPROACH_TYPE_FAST))
+                 HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2), OBJECT_DIST_NEAR, 0, APPROACH_TYPE_FAST))
       ]
 
     Pilot.__init__ (self, hList)
@@ -66,7 +64,13 @@ class Tanker (WorldObject, Pilot):
                            random.uniform (3, 3.5))
         e.addObj (p)
 
-    if self.offScreen() or self.collision != OBJECT_TYPE_NONE:
+    if self.offScreen():
+      e.events.newEvent ("Tanker safe bonus", EVENT_DISPLAY_COUNT / 2, None)
+      e.score += TANKER_SAFE_POINTS
+      return False
+    if self.collision != OBJECT_TYPE_NONE:
+      if self.collision == OBJECT_TYPE_CANNON:
+        e.events.newEvent ("You destroyed the SS Vinoski! LOL", EVENT_DISPLAY_COUNT, None)
       return False
 
     return True

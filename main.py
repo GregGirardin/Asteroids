@@ -1,13 +1,5 @@
 #!/usr/bin/python
 
-# from Tkinter import *
-# import time, random
-# from Constants import *
-# from Shape import *
-# from Ship import *
-# from Particles import *
-# from Vector import *
-
 from Tanker import *
 from Aliens import *
 from Asteroid import *
@@ -19,8 +11,8 @@ class displayEngine ():
     self.canvas = Canvas (self.root, width = SCREEN_WIDTH, height = SCREEN_HEIGHT)
     self.canvas.pack()
     self.highScore = 0
-    self.eventFlag = None
     self.eventDisplayCount = 0
+    self.events = gameEvents()
     self.newGame()
 
   def newGame (self):
@@ -38,6 +30,15 @@ class displayEngine ():
     self.nextTanker = random.uniform (2000, 2500)
     self.nextAlien = random.uniform (100, 200)
     self.nextAsteroid = random.uniform (100, 200)
+
+    # this handles a corner case of ship being destroyed at the end of a wave
+    shipPresent = False
+    for obj in self.objects:
+      if obj.type == OBJECT_TYPE_SHIP:
+        shipPresent = True
+        break
+    if shipPresent == False:
+      self.respawn = True
 
   def gameOver (self):
     if self.score > self.highScore:
@@ -65,7 +66,7 @@ class displayEngine ():
     self.nextTanker -= 1
     if self.nextTanker < 0:
       e.addObj (Tanker())
-      self.nextTanker = random.uniform (2000, 2500)
+      self.nextTanker = random.uniform (1000, 2000)
 
     if self.remainingAsteroids > 0:
       self.nextAsteroid -= 1
@@ -85,41 +86,24 @@ class displayEngine ():
           a = BigAlien()
         e.addObj (a)
 
-    if self.numShips < 0:
-      self.eventFlag = GAME_OVER_FLAG
-    else:
-      # check if wave complete
-      if self.remainingAsteroids == 0 and self.remainingAliens == 0 and self.waveComplete == False:
-        checkComplete = True
-        for obj in self.objects:
-          if obj.type == OBJECT_TYPE_ALIEN or obj.type == OBJECT_TYPE_ASTEROID:
-            checkComplete = False
-            break
-        if checkComplete == True:
-          self.waveComplete = True
-          if self.wave == NUM_WAVES:
-            self.eventFlag = GAME_OVER_FLAG
-          else:
-            self.wave += 1
-            self.eventFlag = NEW_WAVE_FLAG
+    # check if wave complete
+    if self.remainingAsteroids == 0 and self.remainingAliens == 0 and self.waveComplete == False:
+      checkComplete = True
+      for obj in self.objects:
+        if obj.type == OBJECT_TYPE_ALIEN or obj.type == OBJECT_TYPE_ASTEROID:
+          checkComplete = False
+          break
+      if checkComplete == True:
+        self.waveComplete = True
+        if self.wave == NUM_WAVES:
+          self.events.newEvent ("Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
+        else:
+          self.wave += 1
+          t = "Wave %d" % self.wave
+          self.events.newEvent (t, EVENT_DISPLAY_COUNT, self.newWave (self.wave))
 
-    # event flags
-    if self.eventFlag:
-      if self.eventFlag == GAME_OVER_FLAG:
-        if self.eventDisplayCount == 0:
-          self.eventDisplayCount = EVENT_DISPLAY_COUNT * 3
-      elif self.eventFlag == NEW_WAVE_FLAG:
-        if self.eventDisplayCount == 0:
-          self.eventDisplayCount = EVENT_DISPLAY_COUNT
-
-      if self.eventDisplayCount > 0:
-        self.eventDisplayCount -= 1
-        if self.eventDisplayCount == 0:
-          if self.eventFlag == NEW_WAVE_FLAG:
-            self.newWave (self.wave)
-          elif self.eventFlag == GAME_OVER_FLAG:
-            self.gameOver()
-          self.eventFlag = None
+    # events
+    self.events.update()
 
   def addObj (self, obj):
     self.objects.append (obj)
@@ -141,14 +125,8 @@ class displayEngine ():
     t = "Wave %d" % self.wave
     self.canvas.create_text (350, 10, text = t)
 
-    # event flags
-    if self.eventFlag:
-      if self.eventFlag == NEW_WAVE_FLAG:
-        t = "Wave %d" % self.wave
-        self.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = t)
-      if self.eventFlag == GAME_OVER_FLAG:
-        t = "You have failed fuckhead."
-        self.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = t)
+    # events
+    self.events.draw (self)
 
     self.root.update()
 

@@ -47,7 +47,7 @@ class Ship (WorldObject):
       p = SmokeParticle (Point (self.p.x, self.p.y),
                          Vector (3, self.a + PI + random.uniform (-.25, .25)),
                          random.randrange (10, 20),
-                         self.accel * 30 * random.uniform (.5, 1))
+                         self.accel * random.uniform (15, 30))
       e.addObj (p)
     if self.cannon > 0 and self.rounds > 0:
       p = CanonParticle (Point (self.p.x + 10 * math.cos (self.a),
@@ -66,6 +66,9 @@ class Ship (WorldObject):
       self.collision = OBJECT_TYPE_NONE
     elif self.collision != OBJECT_TYPE_NONE:
       e.numShips -= 1
+      if e.numShips < 0:
+        e.newEvent ("You have failed fuckhead.", EVENT_DISPLAY_COUNT * 2, e.gameOver)
+
       for _ in range (1, int (30 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (2 * random.random(), TAU * random.random ()).impulse (self.v),
