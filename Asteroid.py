@@ -42,10 +42,10 @@ class Asteroid (WorldObject):
     WorldObject.update (self, e)
 
     if self.collision != OBJECT_TYPE_NONE:
-      for _ in  range (1, int (30 + random.random() * 10)):
+      for _ in  range (1, int (20 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (2 * random.random(), random.uniform(0, TAU)),
-                           random.randrange (20, 30),
+                           random.randrange (10, 20),
                            (random.random() / 2 + 3))
         e.addObj (p)
 

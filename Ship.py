@@ -36,17 +36,12 @@ class Ship (WorldObject):
       self.fuel -= self.accel * 2
 
     # bounce off walls
-    if self.p.x < 0:
-      self.p.x = 0
-      self.v.direction += PI # TBD
-    elif self.p.x > SCREEN_WIDTH:
-      self.p.x = SCREEN_WIDTH
-    if self.p.y < 0:
-      self.p.y = 0
-      self.v.direction += PI # TBD
-    elif self.p.y > SCREEN_HEIGHT:
-      self.p.y = SCREEN_HEIGHT
-      self.v.direction += PI # TBD
+    if self.p.x < 0 or self.p.x > SCREEN_WIDTH:
+      self.v.flipx()
+      self.v.magnitude *= .8
+    if self.p.y < 0 or self.p.y > SCREEN_HEIGHT:
+      self.v.flipy()
+      self.v.magnitude *= .8
 
     if self.accel > 0:
       p = SmokeParticle (Point (self.p.x, self.p.y),

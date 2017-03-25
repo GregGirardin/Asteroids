@@ -59,7 +59,7 @@ class Tanker (WorldObject, Pilot):
     if self.collision == OBJECT_TYPE_SHIP:
        self.collision = OBJECT_TYPE_NONE
     elif self.collision != OBJECT_TYPE_NONE:
-      for _ in  range (1, int (random.uniform (50, 60))):
+      for _ in  range (1, int (random.uniform (20, 40))):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (random.random(), random.uniform (0, TAU)).impulse (self.v),
                            random.uniform (30, 50),

@@ -1,14 +1,14 @@
 #!/usr/bin/python
 
-from Tkinter import *
-import time, math, random
-from Constants import *
-from Shape import *
-from Ship import *
+# from Tkinter import *
+# import time, random
+# from Constants import *
+# from Shape import *
+# from Ship import *
 from Tanker import *
-from Particles import *
+#from Particles import *
 from Aliens import *
-from Vector import *
+# from Vector import *
 from Asteroid import *
 from Utils import *
 
