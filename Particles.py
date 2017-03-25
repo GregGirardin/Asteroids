@@ -28,14 +28,14 @@ class SmokeParticle (WorldObject):
     self.shape.draw (canvas, p, a)
 
 class CanonParticle (WorldObject):
-  def __init__ (self, p, v, ttl):
+  def __init__ (self, p, v, ttl, type = OBJECT_TYPE_CANNON):
     self.ttl = ttl
     size = 1
     s = [(-size,-size, size, size, None),
          (-size, size, size,-size, None)]
     self.shape = Shape (s)
     self.collision = OBJECT_TYPE_NONE
-    WorldObject.__init__ (self, OBJECT_TYPE_CANNON, p, 0, v, 2)
+    WorldObject.__init__ (self, type, p, 0, v, 2)
 
   def update (self, e):
     WorldObject.update (self, e)

@@ -173,7 +173,7 @@ def downHandler (event):
 
 def keyHandler (event):
   if event.char == " ":
-    if s.collision > 0:
+    if s.collision > 0 and e.numShips > 0:
       e.respawn = True
     else:
       s.cannon = s.numRoundsPF

@@ -15,30 +15,37 @@ class SmallAlien (WorldObject, Pilot):
 
     self.shape = Shape (s)
     self.collision = OBJECT_TYPE_NONE
+    self.cannon = 0
 
     if random.random () < .5:
-      hList = [ # this jerk flys around forever
-        Heuristic ("1", HEUR_GOTO, "2",
+      hList = [ # this jerk flys around forever and shoots at you
+        Heuristic ("1", HEUR_GOTO, "1a",
                    HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .25),
                                   OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("2", HEUR_GOTO, "3",
+        Heuristic ("1a", HEUR_ATTACK, "2", HeuristicAttack (100)),
+        Heuristic ("2", HEUR_GOTO, "2a",
                    HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .25),
                                   OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("3", HEUR_GOTO, "4",
+        Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (100)),
+        Heuristic ("3", HEUR_GOTO, "3a",
                    HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .75),
                                   OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("4", HEUR_GOTO, "1",
+        Heuristic ("3a", HEUR_ATTACK, "4", HeuristicAttack (100)),
+        Heuristic ("4", HEUR_GOTO, "4a",
                    HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .75),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST))
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+        Heuristic ("4a", HEUR_ATTACK, "1", HeuristicAttack (100)),
+
         ]
     else:
       hList = [
-        Heuristic ("Init", HEUR_GOTO, "2",
+        Heuristic ("1", HEUR_GOTO, "2",
                    HeuristicGoto (Point (SCREEN_WIDTH * .25, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
                                   OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("2", HEUR_GOTO, "3",
+        Heuristic ("2", HEUR_GOTO, "2a",
                    HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
+                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_SLOW)),
+        Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (200)),
         Heuristic ("3", HEUR_GOTO, "4",
                    HeuristicGoto (Point (SCREEN_WIDTH * .75, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
                                   OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
@@ -54,6 +61,13 @@ class SmallAlien (WorldObject, Pilot):
   def update (self, e):
     Pilot.pilot (self, e)
     WorldObject.update (self, e)
+
+    if self.cannon > 0:
+      self.cannon -= 1
+      p = CanonParticle (Point (self.p.x + 10 * math.cos (self.a),
+                                self.p.y - 10 * math.sin (self.a)),
+                         Vector (7, self.a), 120, type = OBJECT_TYPE_AL_CANNON)
+      e.addObj (p)
 
     if self.collision != OBJECT_TYPE_NONE:
       for _ in  range (1, int (10 + random.random() * 10)):

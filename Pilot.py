@@ -42,9 +42,12 @@ class HeuristicWait ():
     self.duration = duration
 
 class HeuristicAttack ():
-  def __init__ (self, target, at):
-    self.target = target # point to wait at
-
+  def __init__ (self, duration = 50):
+    self.duration = duration
+    self.durationCounter = duration
+    self.attackState = ATTACK_INIT
+    self.aangleOffset = random.uniform (-.2, .2) # shoot a bit randomly
+    self.ttNextAttack = 1
 ####
 
 class Heuristic ():
@@ -115,12 +118,8 @@ class Pilot ():
       targetVector = Vector (targetSpeed, dirToTarget) # Ideal velocity vector from 'p' to target
       correctionVec = vectorDiff (self.v, targetVector) # vector to make our velocity approach targetVector
 
-      # if we're pretty close to targetVector, just go straight
-      # continuous adjustment causes erratic behavior.
-      #if h.targetReached and h.approachType == APPROACH_TYPE_SLOW:
-      # if self.v.magnitude < SPEED_SLOW
-      #  desiredVec = Vector (self.v.magnitude, self.v.direction + PI)
-      #else:
+      # If we're pretty close to targetVector, just go straight
+      # Continuous adjustment causes erratic behavior.
       desiredVec = targetVector if correctionVec.magnitude < targetVector.magnitude / 3 else correctionVec
 
       da = angleTo (self.a, desiredVec.direction)
@@ -159,6 +158,42 @@ class Pilot ():
     return False
 
   def handleAttack (self, e):
+    h = self.currentH.heuristic
+
+    h.durationCounter -= 1
+    if h.durationCounter <= 0:
+      h.durationCounter = h.duration
+      return True
+
+    if h.attackState == ATTACK_INIT:
+      if h.ttNextAttack == 0:
+        h.attackState = ATTACK_ALIGN
+        h.aangleOffset = random.uniform (-.2, .2) # shoot a bit randomly
+      else:
+        h.ttNextAttack -= 1
+
+    if h.attackState == ATTACK_ALIGN:
+      s = None
+      for obj in e.objects:
+        if obj.type == OBJECT_TYPE_SHIP:
+          s = obj
+          break
+
+      if not s:
+        return True
+
+      goalDir = dir (s.p.x - self.p.x, s.p.y - self.p.y) + h.aangleOffset
+      aToGoal = angleTo (self.a, goalDir)
+
+      if math.fabs (aToGoal) < .1:
+        self.cannon = 1 # cannon handled in update
+        h.attackState = ATTACK_INIT
+        h.ttNextAttack = random.randrange (20, 70)
+      else:
+        self.spin = aToGoal / 10
+
+    # are we facing sort of in the direction of the Ship
+
     return False
 
   def pilot (self, e):
