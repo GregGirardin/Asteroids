@@ -5,10 +5,11 @@
 # from Constants import *
 # from Shape import *
 # from Ship import *
-from Tanker import *
-#from Particles import *
-from Aliens import *
+# from Particles import *
 # from Vector import *
+
+from Tanker import *
+from Aliens import *
 from Asteroid import *
 from Utils import *
 
@@ -18,6 +19,8 @@ class displayEngine ():
     self.canvas = Canvas (self.root, width = SCREEN_WIDTH, height = SCREEN_HEIGHT)
     self.canvas.pack()
     self.highScore = 0
+    self.eventFlag = None
+    self.eventDisplayCount = 0
     self.newGame()
 
   def newGame (self):
@@ -28,15 +31,10 @@ class displayEngine ():
     self.newWave (1)
 
   def newWave (self, wave):
-    t = "Wave %d" % wave
-    if wave > 1:
-      self.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = t)
-      self.root.update()
-      time.sleep (2)
-
     self.remainingAsteroids = 10 * wave
     self.remainingAliens = 10 * wave
     self.wave = wave
+    self.waveComplete = False
     self.nextTanker = random.uniform (2000, 2500)
     self.nextAlien = random.uniform (100, 200)
     self.nextAsteroid = random.uniform (100, 200)
@@ -46,11 +44,6 @@ class displayEngine ():
       self.highScore = self.score
     self.newGame()
     s = None
-    t = "You have failed fuckhead."
-    self.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = t)
-    self.root.update()
-
-    time.sleep (5)
 
   def update (self):
     # collision detection (fix wasteful checks)
@@ -79,7 +72,7 @@ class displayEngine ():
       if self.nextAsteroid < 0:
         self.remainingAsteroids -= 1
         self.nextAsteroid = random.uniform (100, 200)
-        e.addObj (Asteroid (random.uniform (20, 30)))
+        e.addObj (Asteroid (random.uniform (10, 50)))
 
     if self.remainingAliens > 0:
       self.nextAlien -= 1
@@ -93,21 +86,40 @@ class displayEngine ():
         e.addObj (a)
 
     if self.numShips < 0:
-      self.gameOver()
+      self.eventFlag = GAME_OVER_FLAG
     else:
-    # check if wave complete
-      if self.remainingAsteroids == 0 and self.remainingAliens == 0:
-        complete = True
+      # check if wave complete
+      if self.remainingAsteroids == 0 and self.remainingAliens == 0 and self.waveComplete == False:
+        checkComplete = True
         for obj in self.objects:
           if obj.type == OBJECT_TYPE_ALIEN or obj.type == OBJECT_TYPE_ASTEROID:
-            complete = False
+            checkComplete = False
             break
-        if complete == True:
-          self.wave += 1
-          if self.wave > NUM_WAVES:
-            self.gameOver()
+        if checkComplete == True:
+          self.waveComplete = True
+          if self.wave == NUM_WAVES:
+            self.eventFlag = GAME_OVER_FLAG
           else:
+            self.wave += 1
+            self.eventFlag = NEW_WAVE_FLAG
+
+    # event flags
+    if self.eventFlag:
+      if self.eventFlag == GAME_OVER_FLAG:
+        if self.eventDisplayCount == 0:
+          self.eventDisplayCount = EVENT_DISPLAY_COUNT * 3
+      elif self.eventFlag == NEW_WAVE_FLAG:
+        if self.eventDisplayCount == 0:
+          self.eventDisplayCount = EVENT_DISPLAY_COUNT
+
+      if self.eventDisplayCount > 0:
+        self.eventDisplayCount -= 1
+        if self.eventDisplayCount == 0:
+          if self.eventFlag == NEW_WAVE_FLAG:
             self.newWave (self.wave)
+          elif self.eventFlag == GAME_OVER_FLAG:
+            self.gameOver()
+          self.eventFlag = None
 
   def addObj (self, obj):
     self.objects.append (obj)
@@ -128,6 +140,15 @@ class displayEngine ():
     self.canvas.create_text (700, 10, text = t)
     t = "Wave %d" % self.wave
     self.canvas.create_text (350, 10, text = t)
+
+    # event flags
+    if self.eventFlag:
+      if self.eventFlag == NEW_WAVE_FLAG:
+        t = "Wave %d" % self.wave
+        self.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = t)
+      if self.eventFlag == GAME_OVER_FLAG:
+        t = "You have failed fuckhead."
+        self.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = t)
 
     self.root.update()
 

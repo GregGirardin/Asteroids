@@ -7,10 +7,10 @@ from Utils import *
 class Asteroid (WorldObject):
   def __init__ (self, radius):
 
-    radii = 8 + int (random.random() * 5)
+    radii = 6 + int (random.random() * 5)
     r = []
     for _ in range (0, radii):
-      r.append (radius + random.random() * 12 - 4)
+      r.append (radius + random.random() * 5)
     r.append (r [0])
 
     s = []
@@ -26,7 +26,7 @@ class Asteroid (WorldObject):
     self.shape = Shape (s)
 
     if random.random() < .5:
-      v = Vector (random.uniform (.2, 2),random.uniform (PI + PI * .2, PI + PI * .8))
+      v = Vector (random.uniform (.2, 2), random.uniform (PI + PI * .2, PI + PI * .8))
       initY = -SCREEN_BUFFER + 1
     else:
       v = Vector (random.uniform (.2, 2), random.uniform (PI * .2, PI * .8))
@@ -42,15 +42,15 @@ class Asteroid (WorldObject):
     WorldObject.update (self, e)
 
     if self.collision != OBJECT_TYPE_NONE:
-      for _ in  range (1, int (20 + random.random() * 10)):
+      for _ in  range (1, int (10 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
-                           Vector (2 * random.random(), random.uniform(0, TAU)),
+                           Vector (2 * random.random(), random.uniform (0, TAU)),
                            random.randrange (10, 20),
                            (random.random() / 2 + 3))
         e.addObj (p)
 
       if self.collisionRadius > 15:
-        vector = random.random() * 2 * PI
+        vector = random.uniform (0, TAU)
         for v in (0, PI):
           a = Asteroid (self.collisionRadius / 2)
           a.p.x = self.p.x + self.collisionRadius * math.cos (vector + v)

@@ -35,7 +35,7 @@ class CanonParticle (WorldObject):
          (-size, size, size,-size, None)]
     self.shape = Shape (s)
     self.collision = OBJECT_TYPE_NONE
-    WorldObject.__init__ (self, OBJECT_TYPE_CANNON, p, 0, v, 0)
+    WorldObject.__init__ (self, OBJECT_TYPE_CANNON, p, 0, v, 2)
 
   def update (self, e):
     WorldObject.update (self, e)

@@ -1,6 +1,6 @@
 from Constants import *
 from Shape import *
-import math, random
+import math
 
 # 0 is right, PI/2 is up, PI is left, -PI/2 is down
 

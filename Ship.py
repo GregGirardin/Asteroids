@@ -36,10 +36,10 @@ class Ship (WorldObject):
       self.fuel -= self.accel * 2
 
     # bounce off walls
-    if self.p.x < 0 or self.p.x > SCREEN_WIDTH:
+    if self.p.x < 0 and self.v.dx() < 0 or self.p.x > SCREEN_WIDTH and self.v.dx() > 0:
       self.v.flipx()
       self.v.magnitude *= .8
-    if self.p.y < 0 or self.p.y > SCREEN_HEIGHT:
+    if self.p.y < 0 and self.v.dy() < 0 or self.p.y > SCREEN_HEIGHT and self.v.dy() > 0:
       self.v.flipy()
       self.v.magnitude *= .8
 
@@ -66,7 +66,7 @@ class Ship (WorldObject):
       self.collision = OBJECT_TYPE_NONE
     elif self.collision != OBJECT_TYPE_NONE:
       e.numShips -= 1
-      for _ in  range (1, int (30 + random.random() * 10)):
+      for _ in range (1, int (30 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (2 * random.random(), TAU * random.random ()).impulse (self.v),
                            random.uniform (20, 50),
