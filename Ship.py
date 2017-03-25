@@ -67,7 +67,7 @@ class Ship (WorldObject):
     elif self.collision != OBJECT_TYPE_NONE:
       e.numShips -= 1
       if e.numShips < 0:
-        e.newEvent ("You have failed fuckhead.", EVENT_DISPLAY_COUNT * 2, e.gameOver)
+        e.events.newEvent ("You have failed fuckhead.", EVENT_DISPLAY_COUNT * 2, e.gameOver)
 
       for _ in range (1, int (30 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),

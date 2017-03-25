@@ -31,15 +31,6 @@ class displayEngine ():
     self.nextAlien = random.uniform (100, 200)
     self.nextAsteroid = random.uniform (100, 200)
 
-    # this handles a corner case of ship being destroyed at the end of a wave
-    shipPresent = False
-    for obj in self.objects:
-      if obj.type == OBJECT_TYPE_SHIP:
-        shipPresent = True
-        break
-    if shipPresent == False:
-      self.respawn = True
-
   def gameOver (self):
     if self.score > self.highScore:
       self.highScore = self.score
@@ -96,7 +87,7 @@ class displayEngine ():
       if checkComplete == True:
         self.waveComplete = True
         if self.wave == NUM_WAVES:
-          self.events.newEvent ("Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
+          self.events.newEvent ("Congration. Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
         else:
           self.wave += 1
           t = "Wave %d" % self.wave
@@ -106,7 +97,11 @@ class displayEngine ():
     self.events.update()
 
   def addObj (self, obj):
-    self.objects.append (obj)
+    # a little hack to put the ship at the head of the list since we search for it every 'space'
+    if obj.type == OBJECT_TYPE_SHIP:
+      self.objects.insert (0, obj)
+    else:
+      self.objects.append (obj)
 
   def draw (self):
     self.canvas.delete (ALL)
@@ -151,7 +146,14 @@ def downHandler (event):
 
 def keyHandler (event):
   if event.char == " ":
-    if s.collision > 0 and e.numShips > 0:
+
+    # Wasteful. Fix this.
+    shipPresent = False
+    for obj in e.objects:
+      if obj.type == OBJECT_TYPE_SHIP:
+        shipPresent = True
+        break
+    if shipPresent == False and e.numShips >= 0:
       e.respawn = True
     else:
       s.cannon = s.numRoundsPF
