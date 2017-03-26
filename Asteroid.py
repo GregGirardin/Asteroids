@@ -41,12 +41,12 @@ class Asteroid (WorldObject):
   def update (self, e):
     WorldObject.update (self, e)
 
-    if self.collision != OBJECT_TYPE_NONE:
+    if self.collisionObj:
       for _ in  range (1, int (10 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (2 * random.random(), random.uniform (0, TAU)),
                            random.randrange (10, 20),
-                           (random.random() / 2 + 3))
+                           random.uniform (3, 4))
         e.addObj (p)
 
       if self.collisionRadius > 15:
@@ -58,10 +58,11 @@ class Asteroid (WorldObject):
           a.velocity = Vector (self.v.magnitude * 1.5, self.v.direction + v)
           e.addObj (a)
 
-      if self.collision == OBJECT_TYPE_CANNON:
+      t = self.collisionObj.type
+      if t== OBJECT_TYPE_CANNON or t == OBJECT_TYPE_T_CANNON or t == OBJECT_TYPE_TORPEDO:
         e.score += ASTEROID_POINTS
 
-    if self.offScreen() or self.collision != OBJECT_TYPE_NONE:
+    if self.offScreen() or self.collisionObj:
       return False
 
     return True

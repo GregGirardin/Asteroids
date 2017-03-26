@@ -27,7 +27,7 @@ class displayEngine ():
     self.remainingAliens = 10 * wave
     self.wave = wave
     self.waveComplete = False
-    self.nextTanker = random.uniform (2000, 2500)
+    self.nextTanker = 0 # random.uniform (2000, 2500)
     self.nextAlien = random.uniform (100, 200)
     self.nextAsteroid = random.uniform (100, 200)
 
@@ -40,13 +40,15 @@ class displayEngine ():
   def update (self):
     # collision detection (fix wasteful checks)
     for obj1 in self.objects:
+      obj1.collisionObj = None
+    for obj1 in self.objects:
       for obj2 in self.objects:
         if obj2 is not obj1:
           if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
             rad = obj1.collisionRadius + obj2.collisionRadius
             if obj1.p.distanceTo (obj2.p) < rad:
-              obj1.collision = obj2.type
-              obj2.collision = obj1.type
+              obj1.collisionObj = obj2
+              obj2.collisionObj = obj1
 
     # update objects
     for obj in self.objects:
@@ -138,7 +140,7 @@ def rightHandler (event):
     s.spin -= SPIN_DELTA
 
 def upHandler (event):
-  s.accel += .01
+  s.accel += .03
 
 def downHandler (event):
   s.accel = 0
@@ -146,7 +148,6 @@ def downHandler (event):
 
 def keyHandler (event):
   if event.char == " ":
-
     # Wasteful. Fix this.
     shipPresent = False
     for obj in e.objects:
@@ -156,9 +157,10 @@ def keyHandler (event):
     if shipPresent == False and e.numShips >= 0:
       e.respawn = True
     else:
-      s.cannon = s.numRoundsPF
-      if e.score:
-        e.score -= 1
+      s.fireCannon = True
+
+  elif event.char == 't':
+    s.fireTorpedo = True
 
 e = displayEngine()
 

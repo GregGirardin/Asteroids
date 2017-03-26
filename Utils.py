@@ -16,6 +16,7 @@ class WorldObject ():
     self.type = type
     self.accel = 0.0
     self.collisionRadius = collisionRadius
+    self.collisionObj = None
 
   def offScreen (self):
     if self.p.x < -SCREEN_BUFFER or self.p.x > SCREEN_WIDTH + SCREEN_BUFFER or \
@@ -31,7 +32,7 @@ class WorldObject ():
     elif self.a > TAU:
       self.a -= TAU
 
-    self.v.impulse (Vector (self.accel, self.a))
+    self.v.add (Vector (self.accel, self.a))
     self.p.move (self.v)
 
 # Could try to make this a WorldObject if that's cleaner

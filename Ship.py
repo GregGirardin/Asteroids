@@ -12,11 +12,13 @@ class Ship (WorldObject):
          (-5,-5, 10, 0, None),
          (-5,-5, -5, 5, None)]
     self.shape = Shape (s)
-    self.cannon = 0
-    self.collision = OBJECT_TYPE_NONE
-    self.numRoundsPF = 1
-    self.rounds = 100.0
-    self.fuel = 100.0
+    self.fireCannon = False
+    self.fireTorpedo = False
+    self.rounds = 50.0
+    self.fuel = 50.0
+    self.torpedos = 50.0
+    self.torpedoDelay = 0
+
     WorldObject.__init__ (self,
                           OBJECT_TYPE_SHIP,
                           Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT / 2),
@@ -49,33 +51,77 @@ class Ship (WorldObject):
                          random.randrange (10, 20),
                          self.accel * random.uniform (15, 30))
       e.addObj (p)
-    if self.cannon > 0 and self.rounds > 0:
+    if self.fireCannon is True and self.rounds > 0:
       p = CanonParticle (Point (self.p.x + 10 * math.cos (self.a),
                                 self.p.y - 10 * math.sin (self.a)),
-                         Vector (7, self.a), 120)
+                         Vector (7, self.a).add (self.v),
+                         120)
       e.addObj (p)
-      self.cannon -= 1
+      self.fireCannon = False
       self.rounds -= .5
-    else:
-      self.cannon = 0
+      if e.score:
+        e.score -= 1
 
-    # collisions
-    if self.collision == OBJECT_TYPE_TANKER:
-      self.fuel = 100.0
-      self.rounds = 100.0
-      self.collision = OBJECT_TYPE_NONE
-    elif self.collision != OBJECT_TYPE_NONE:
-      e.numShips -= 1
-      if e.numShips < 0:
-        e.events.newEvent ("You have failed fuckhead.", EVENT_DISPLAY_COUNT * 2, e.gameOver)
+    if self.torpedoDelay > 0:
+      self.torpedoDelay -= 1
+      self.fireTorpedo = False
 
-      for _ in range (1, int (30 + random.random() * 10)):
-        p = SmokeParticle (Point (self.p.x, self.p.y),
-                           Vector (2 * random.random(), TAU * random.random ()).impulse (self.v),
-                           random.uniform (20, 50),
-                           random.uniform (3, 3.5))
+    if self.fireTorpedo is True:
+      if self.torpedos > 0:
+        p = Torpedo (Point (self.p.x + 10 * math.cos (self.a), self.p.y - 10 * math.sin (self.a)),
+                            Vector (7, self.a).add (self.v),
+                            150)
         e.addObj (p)
-      return False
+        self.torpedos -= 10
+        self.torpedoDelay = TORPEDO_DELAY
+        if e.score > 0:
+          e.score -= 20
+      self.fireTorpedo = False
+
+    if self.collisionObj:
+      if self.collisionObj.type == OBJECT_TYPE_TANKER:
+        # transfer resources / dock.
+
+        t = self.collisionObj
+        if t.fuel > 0:
+          if self.fuel < 100:
+            self.fuel += 1
+            t.fuel -= 1
+          else:
+            t.transferComplete |= TX_RESOURCE_FUEL
+        else:
+          t.transferComplete |= TX_RESOURCE_FUEL
+
+        if t.rounds > 0:
+          if self.rounds < 100:
+            self.rounds += 1
+            t.rounds -= 1
+          else:
+            t.transferComplete |= TX_RESOURCE_ROUNDS
+        else:
+          t.transferComplete |= TX_RESOURCE_ROUNDS
+
+        if t.torpedos > 0:
+          if self.torpedos < 100:
+            self.torpedos += 1
+            t.torpedos -= 1
+          else:
+            t.transferComplete |= TX_RESOURCE_TORPEDOS
+        else:
+          t.transferComplete |= TX_RESOURCE_TORPEDOS
+
+      else:
+        e.numShips -= 1
+        if e.numShips < 0:
+          e.events.newEvent ("You have failed fuckhead.", EVENT_DISPLAY_COUNT * 2, e.gameOver)
+
+        for _ in range (1, int (30 + random.random() * 10)):
+          p = SmokeParticle (Point (self.p.x, self.p.y),
+                             Vector (2 * random.random(), TAU * random.random ()).add (self.v),
+                             random.uniform (20, 50),
+                             random.uniform (3, 3.5))
+          e.addObj (p)
+        return False
     return True
 
   def draw (self, canvas, p, a):
@@ -83,6 +129,8 @@ class Ship (WorldObject):
 
     canvas.create_rectangle (100,  5, 100 + 200, 7)
     fill = "red" if self.fuel < 20.0 else "black"
-    canvas.create_rectangle (100, 10, 100 + 200 * self.fuel / 100, 15, fill=fill)
+    canvas.create_rectangle (100, 10, 100 + 200 * self.fuel / 100, 12, fill=fill)
     fill = "red" if self.rounds < 20.0 else "black"
-    canvas.create_rectangle (100, 20, 100 + 200 * self.rounds / 100, 25, fill=fill)
+    canvas.create_rectangle (100, 20, 100 + 200 * self.rounds / 100, 22, fill=fill)
+    fill = "red" if self.torpedos < 20.0 else "black"
+    canvas.create_rectangle (100, 30, 100 + 200 * self.torpedos / 100, 32, fill=fill)

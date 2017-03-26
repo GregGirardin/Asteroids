@@ -29,6 +29,18 @@ from Vector import *
 
 debugVectors = False
 
+class HeuristicGo ():
+  def __init__(self, velocity, duration):
+    self.hVelocity = velocity
+    self.hDuration = duration
+
+class HeuristicFace():
+  def __init__(self, angle):
+    self.hAngle = angle
+
+class HeuristicStop():
+  pass
+
 class HeuristicGoto ():
   def __init__ (self, target, distance, duration, at = APPROACH_TYPE_SLOW):
     self.target = target
@@ -39,7 +51,7 @@ class HeuristicGoto ():
 
 class HeuristicWait ():
   def __init__ (self, duration):
-    self.duration = duration
+    self.hDuration = duration
 
 class HeuristicAttack ():
   def __init__ (self, duration = 50):
@@ -48,6 +60,7 @@ class HeuristicAttack ():
     self.attackState = ATTACK_INIT
     self.aangleOffset = random.uniform (-.2, .2) # shoot a bit randomly
     self.ttNextAttack = 1
+
 ####
 
 class Heuristic ():
@@ -57,8 +70,7 @@ class Heuristic ():
     self.next = next
     self.heuristic = heuristic
 
-# auto piloted ships inherit from this class
-# they are also 'WorldObject's
+# Auto piloted things inherit from this class. They are also "WorldObject"s
 class Pilot ():
   def __init__ (self, hList):
     self.hList = hList
@@ -72,6 +84,48 @@ class Pilot ():
   def setHlist (self, hList):
     self.hList = hList
     self.currentH = hList [0]
+
+  def handleGo (self, e):
+    h = self.currentH.heuristic
+
+    if h.hDuration > 0:
+      h.hDuration -= 1
+      if self.v.magnitude < h.hVelocity:
+        self.accel = THRUST_MED
+      else:
+        self.accel = 0
+      return False
+    else:
+      return True
+
+  def handleFace (self, e):
+    h = self.currentH.heuristic
+
+    dirTo = angleTo (self.a, h.hAngle)
+    if math.fabs (dirTo) > .05:
+      self.spin = dirTo / 20
+      return False
+    else:
+      self.spin = 0
+      return True
+
+  def handleStop (self, e):
+    if self.v.magnitude > SPEED_SLOW / 20:
+      # turn around
+      targetDir = angleNorm (self.v.direction + PI)
+      dirTo = angleTo (self.a, targetDir)
+      if math.fabs (dirTo) > .05:
+        self.accel = 0
+        self.spin = dirTo / 20
+      else:
+        self.accel = THRUST_HI
+        self.spin = 0
+    else:
+      self.accel = 0
+      self.spin = 0
+      return True
+
+    return False
 
   def handleGoto (self, e):
     h = self.currentH.heuristic
@@ -151,8 +205,10 @@ class Pilot ():
     self.accel = 0
     self.spin = 0
 
-    h.duration -= 1
-    if h.duration < 0:
+    print "Wait",  h.hDuration
+
+    h.hDuration -= 1
+    if h.hDuration < 0:
       return True
 
     return False
@@ -206,6 +262,12 @@ class Pilot ():
 
     s = False
 
+    if self.currentH.type == HEUR_GO:
+      s = self.handleGo (e)
+    if self.currentH.type == HEUR_FACE:
+      s = self.handleFace (e)
+    if self.currentH.type == HEUR_STOP:
+      s = self.handleStop (e)
     if self.currentH.type == HEUR_GOTO:
       s = self.handleGoto (e)
     elif self.currentH.type == HEUR_WAIT:

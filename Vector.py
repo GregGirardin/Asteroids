@@ -10,12 +10,28 @@ class Vector ():
     self.direction = d
 
   # add vector v
-  def impulse (self, v):
+  def add (self, v, mod = True):
     cx = self.dx() + v.magnitude * math.cos (v.direction)
     cy = self.dy() - v.magnitude * math.sin (v.direction)
+    magnitude = math.sqrt (cx ** 2 + cy ** 2)
+    direction = dir (cx, cy)
+    if mod:
+      self.magnitude = magnitude
+      self.direction = direction
+    return Vector (magnitude, direction)
+
+  # make vector a bit closer to aVec
+  def adjust (self, aVec, weight = .1):
+    assert weight <= 1.0
+
+    adx = (aVec.dx() - self.dx()) * weight
+    ady = (aVec.dy() - self.dy()) * weight
+
+    cx = self.dx() + adx
+    cy = self.dy() + ady
+
     self.magnitude = math.sqrt (cx ** 2 + cy ** 2)
     self.direction = dir (cx, cy)
-    return self
 
   def dx (self): # x component of vector
     return self.magnitude * math.cos (self.direction)

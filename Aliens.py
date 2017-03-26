@@ -14,7 +14,6 @@ class SmallAlien (WorldObject, Pilot):
          (-2,-3, -2, 3, None)]
 
     self.shape = Shape (s)
-    self.collision = OBJECT_TYPE_NONE
     self.cannon = 0
 
     if random.random () < .5:
@@ -69,17 +68,18 @@ class SmallAlien (WorldObject, Pilot):
                          Vector (7, self.a), 120, type = OBJECT_TYPE_AL_CANNON)
       e.addObj (p)
 
-    if self.collision != OBJECT_TYPE_NONE:
+    if self.collisionObj:
       for _ in  range (1, int (10 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
-                           Vector (random.random(), TAU * random.random ()).impulse (self.v),
+                           Vector (random.random(), TAU * random.random ()).add (self.v),
                            20 + random.random() * 20,
                            (random.random() / 2 + 2))
         e.addObj (p)
-      if self.collision == OBJECT_TYPE_CANNON:
+      t = self.collisionObj.type
+      if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
         e.score += SMALL_ALIEN_POINTS
 
-    if self.offScreen() or self.collision != OBJECT_TYPE_NONE:
+    if self.offScreen() or self.collisionObj:
       return False
 
     return True
@@ -88,11 +88,10 @@ class SmallAlien (WorldObject, Pilot):
     self.shape.draw (canvas, p, a)
 
     if debugVectors:
-      canvas.create_line (p.x, p.y, p.x + self.v.dx()  * 20, p.y - self.v.dy()  * 20, arrow=tk.LAST, fill="green")
-      canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y - self.tv.dy() * 20, arrow=tk.LAST)
-      canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y - self.cv.dy() * 20, arrow=tk.LAST, fill="red")
+      canvas.create_line (p.x, p.y, p.x + self.v.dx()  * 20, p.y - self.v.dy()  * 20, arrow = tk.LAST, fill="green")
+      canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y - self.tv.dy() * 20, arrow = tk.LAST)
+      canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y - self.cv.dy() * 20, arrow = tk.LAST, fill="red")
       canvas.create_oval (self.target.x - 2, self.target.y - 2, self.target.x + 2, self.target.y + 2)
-
 
 class BigAlien (WorldObject, Pilot):
   def __init__ (self):
@@ -102,7 +101,6 @@ class BigAlien (WorldObject, Pilot):
          (-10,-8,-10, 8, None)]
 
     self.shape = Shape (s)
-    self.collision = OBJECT_TYPE_NONE
 
     hList = [
       Heuristic ("Init", HEUR_GOTO, "Midway",
@@ -121,17 +119,18 @@ class BigAlien (WorldObject, Pilot):
     Pilot.pilot (self, e)
     WorldObject.update (self, e)
 
-    if self.collision != OBJECT_TYPE_NONE:
+    if self.collisionObj:
       for _ in  range (1, int (30 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
-                           Vector (random.random(), TAU * random.random ()).impulse (self.v),
+                           Vector (random.random(), TAU * random.random ()).add (self.v),
                            30 + random.random() * 20,
                            (random.random() / 2 + 2))
         e.addObj (p)
-      if self.collision == OBJECT_TYPE_CANNON:
+      t = self.collisionObj.type
+      if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
         e.score += BIG_ALIEN_POINTS
 
-    if self.offScreen() or self.collision != OBJECT_TYPE_NONE:
+    if self.offScreen() or self.collisionObj:
       return False
 
     return True
