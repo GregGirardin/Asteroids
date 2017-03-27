@@ -24,7 +24,7 @@ class Tanker (WorldObject, Pilot):
          (-10, 10 ,-5, 0, None)]
 
     # start from the right side, going left.
-    p = Point (SCREEN_WIDTH + SCREEN_BUFFER / 2, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75))
+    p = Point (SCREEN_WIDTH + SCREEN_BUFFER - 1, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75))
     self.shape = Shape (s)
 
     # resources available if ship contacts
@@ -79,7 +79,7 @@ class Tanker (WorldObject, Pilot):
           break
 
     if self.accel > 0:
-      p = SmokeParticle (Point (self.p.x, self.p.y),
+      p = SmokeParticle (Point (self.p.x, self.p.y).move (Vector (3, self.a + PI)),
                          Vector (2, self.a + PI + random.uniform (-.25, .25)),
                          random.uniform (5, 10),
                          self.accel * random.uniform (15, 30))

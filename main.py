@@ -27,7 +27,7 @@ class displayEngine ():
     self.remainingAliens = 10 * wave
     self.wave = wave
     self.waveComplete = False
-    self.nextTanker = 0 # random.uniform (2000, 2500)
+    self.nextTanker = random.uniform (500, 2000)
     self.nextAlien = random.uniform (100, 200)
     self.nextAsteroid = random.uniform (100, 200)
 

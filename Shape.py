@@ -34,6 +34,7 @@ class Point():
   def move (self, v): # v is a Vector PI/2 is up (-y)
     self.x += v.magnitude * math.cos (v.direction)
     self.y -= v.magnitude * math.sin (v.direction)
+    return self
 
   def translate (self, p, theta): # p is location, theta is orientation.
     xr = self.x * math.cos (theta) - self.y * math.sin (theta) + p.x
