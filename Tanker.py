@@ -28,12 +28,11 @@ class Tanker (WorldObject, Pilot):
     self.shape = Shape (s)
 
     # resources available if ship contacts
-    self.fuel = random.uniform (20.0, 100.0)
-    self.torpedos = random.uniform (10.0, 100.0)
-    self.rounds = random.uniform (50.0, 100.0)
+    self.fuel = random.uniform (20.0, 80.0)
+    self.torpedos = random.uniform (30.0, 60.0)
+    self.rounds = random.uniform (50.0, 70.0)
 
     self.refuelComplete = False
-    self.tractorEngaged = False
     self.transferComplete = 0
     self.tPoint = None # Tractor point
 
@@ -47,7 +46,7 @@ class Tanker (WorldObject, Pilot):
       Heuristic ("Wait", HEUR_WAIT, "Depart",
                  HeuristicWait (500)),
       Heuristic ("Depart", HEUR_GOTO, None,
-                 HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2), OBJECT_DIST_NEAR, 0, APPROACH_TYPE_FAST))
+                 HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2), OBJECT_DIST_NEAR, APPROACH_TYPE_FAST))
       ]
 
     Pilot.__init__ (self, hList)
@@ -85,14 +84,14 @@ class Tanker (WorldObject, Pilot):
                          self.accel * random.uniform (15, 30))
       e.addObj (p)
 
-    if ((self.transferComplete & TX_RESOURCE_ALL == TX_RESOURCE_ALL) and self.refuelComplete is False):
+    if (self.transferComplete & TX_RESOURCE_ALL == TX_RESOURCE_ALL) and self.refuelComplete is False:
       self.refuelComplete = True
       e.events.newEvent ("Refuel Complete", EVENT_DISPLAY_COUNT / 2, None)
       hList = [
         Heuristic ("Depart", HEUR_GOTO, None,
                    HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2),
-                                  OBJECT_DIST_NEAR, 0, APPROACH_TYPE_FAST))
-          ]
+                                  OBJECT_DIST_NEAR, APPROACH_TYPE_FAST))
+        ]
       self.setHlist (hList)
 
     if self.collisionObj:
@@ -116,10 +115,10 @@ class Tanker (WorldObject, Pilot):
     if self.tPoint:
       canvas.create_line (p.x, p.y,
                           self.tPoint.x + random.uniform (-2, 2),
-                          self.tPoint.y + random.uniform (-2, 2), fill="green")
+                          self.tPoint.y + random.uniform (-2, 2), fill = "green")
 
     if debugVectors:
-      canvas.create_line (p.x, p.y, p.x + self.v.dx()  * 20, p.y - self.v.dy()  * 20, arrow=tk.LAST, fill="green")
-      canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y - self.tv.dy() * 20, arrow=tk.LAST)
-      canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y - self.cv.dy() * 20, arrow=tk.LAST, fill="red")
+      canvas.create_line (p.x, p.y, p.x + self.v.dx()  * 20, p.y - self.v.dy()  * 20, arrow = tk.LAST, fill = "green")
+      canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y - self.tv.dy() * 20, arrow = tk.LAST)
+      canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y - self.cv.dy() * 20, arrow = tk.LAST, fill = "red")
       canvas.create_oval (self.target.x - 2, self.target.y - 2, self.target.x + 2, self.target.y + 2)

@@ -79,5 +79,5 @@ class Torpedo (WorldObject):
       return False
 
   def draw (self, canvas, p, a):
-    r = self.radius + random.uniform (-1, 1)
+    r = self.radius + random.uniform (-2, 1)
     canvas.create_oval (p.x - r, p.y - r, p.x + r, p.y + r)

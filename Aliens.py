@@ -16,45 +16,52 @@ class SmallAlien (WorldObject, Pilot):
     self.shape = Shape (s)
     self.cannon = 0
 
-    if random.random () < .5:
-      hList = [ # this jerk flys around forever and shoots at you
-        Heuristic ("1", HEUR_GOTO, "1a",
-                   HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .25),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("1a", HEUR_ATTACK, "2", HeuristicAttack (100)),
-        Heuristic ("2", HEUR_GOTO, "2a",
-                   HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .25),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (100)),
-        Heuristic ("3", HEUR_GOTO, "3a",
-                   HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .75),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("3a", HEUR_ATTACK, "4", HeuristicAttack (100)),
-        Heuristic ("4", HEUR_GOTO, "4a",
-                   HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .75),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("4a", HEUR_ATTACK, "1", HeuristicAttack (100)),
-
+    hLists = [
+        [ # randomly flys among a few points, stopping to shoot.
+          Heuristic ("1", HEUR_GOTO, "1a", HeuristicGotoRandom()),
+          Heuristic ("1a", HEUR_ATTACK, "2", HeuristicAttack (100)),
+          Heuristic ("2", HEUR_GOTO, "2a", HeuristicGotoRandom()),
+          Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (100)),
+          Heuristic ("3", HEUR_GOTO, "3a", HeuristicGotoRandom()),
+          Heuristic ("3a", HEUR_ATTACK, "1", HeuristicAttack (100)),
+        ],
+        [ # this one flys around clockwise forever and shoots at you
+          Heuristic ("1", HEUR_GOTO, "1a",
+                     HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .25),
+                                    OBJECT_DIST_MED, APPROACH_TYPE_FAST)),
+          Heuristic ("1a", HEUR_ATTACK, "2", HeuristicAttack (100)),
+          Heuristic ("2", HEUR_GOTO, "2a",
+                     HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .25),
+                                    OBJECT_DIST_MED, APPROACH_TYPE_FAST)),
+          Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (100)),
+          Heuristic ("3", HEUR_GOTO, "3a",
+                     HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .75),
+                                    OBJECT_DIST_MED, APPROACH_TYPE_FAST)),
+          Heuristic ("3a", HEUR_ATTACK, "4", HeuristicAttack (100)),
+          Heuristic ("4", HEUR_GOTO, "4a",
+                     HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .75),
+                                    OBJECT_DIST_MED, APPROACH_TYPE_FAST)),
+          Heuristic ("4a", HEUR_ATTACK, "1", HeuristicAttack (100)),
+        ],
+        [ # This one flys across this screen and shoots at you at a couple points.
+          Heuristic ("1", HEUR_GOTO, "2",
+                     HeuristicGoto (Point (SCREEN_WIDTH * .25, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                    OBJECT_DIST_MED, APPROACH_TYPE_FAST)),
+          Heuristic ("2", HEUR_GOTO, "2a",
+                     HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                    OBJECT_DIST_MED, APPROACH_TYPE_SLOW)),
+          Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (300)),
+          Heuristic ("3", HEUR_GOTO, "3a",
+                     HeuristicGoto (Point (SCREEN_WIDTH * .75, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                    OBJECT_DIST_MED, APPROACH_TYPE_FAST)),
+          Heuristic ("3a", HEUR_ATTACK, "3", HeuristicAttack (300)),
+          Heuristic ("4", HEUR_GOTO, None,
+                     HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
+                                    OBJECT_DIST_FAR, APPROACH_TYPE_FAST))
         ]
-    else:
-      hList = [
-        Heuristic ("1", HEUR_GOTO, "2",
-                   HeuristicGoto (Point (SCREEN_WIDTH * .25, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("2", HEUR_GOTO, "2a",
-                   HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_SLOW)),
-        Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (200)),
-        Heuristic ("3", HEUR_GOTO, "4",
-                   HeuristicGoto (Point (SCREEN_WIDTH * .75, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST)),
-        Heuristic ("4", HEUR_GOTO, None,
-                   HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_FAR, 0, APPROACH_TYPE_FAST))
-        ]
-
+      ]
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
-    Pilot.__init__ (self, hList)
+    Pilot.__init__ (self, hLists[random.randint(0, 2)])
     WorldObject.__init__ (self, OBJECT_TYPE_ALIEN, p, (random.random() - .5) / 4, None, 5)
 
   def update (self, e):
@@ -105,10 +112,10 @@ class BigAlien (WorldObject, Pilot):
     hList = [
       Heuristic ("Init", HEUR_GOTO, "Midway",
                  HeuristicGoto (Point (SCREEN_WIDTH / 2, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                OBJECT_DIST_NEAR, 0, APPROACH_TYPE_FAST)),
+                                OBJECT_DIST_NEAR, APPROACH_TYPE_FAST)),
       Heuristic ("Midway", HEUR_GOTO, None,
                  HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                OBJECT_DIST_MED, 0, APPROACH_TYPE_FAST))
+                                OBJECT_DIST_MED, APPROACH_TYPE_FAST))
       ]
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
 

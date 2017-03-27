@@ -73,7 +73,7 @@ class displayEngine ():
       if self.nextAlien < 0:
         self.remainingAliens -= 1
         self.nextAlien = random.uniform (100, 200)
-        if random.random() < .25:
+        if random.random() < .3 + .15 * self.wave:
           a = SmallAlien()
         else:
           a = BigAlien()

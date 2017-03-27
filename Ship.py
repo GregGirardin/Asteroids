@@ -46,10 +46,11 @@ class Ship (WorldObject):
       self.v.magnitude *= .8
 
     if self.accel > 0:
-      p = SmokeParticle (Point (self.p.x, self.p.y),
-                         Vector (3, self.a + PI + random.uniform (-.25, .25)),
-                         random.randrange (10, 20),
+      p = SmokeParticle (Point (self.p.x, self.p.y).move (Vector (3, self.a + PI)),
+                         Vector (3, self.a + PI + random.uniform (-.3, .3)),
+                         random.randrange (5, 12),
                          self.accel * random.uniform (15, 30))
+
       e.addObj (p)
     if self.fireCannon is True and self.rounds > 0:
       p = CanonParticle (Point (self.p.x + 10 * math.cos (self.a),
@@ -80,33 +81,23 @@ class Ship (WorldObject):
 
     if self.collisionObj:
       if self.collisionObj.type == OBJECT_TYPE_TANKER:
-        # transfer resources / dock.
-
+        # transfer resources
         t = self.collisionObj
-        if t.fuel > 0:
-          if self.fuel < 100:
-            self.fuel += 1
-            t.fuel -= 1
-          else:
-            t.transferComplete |= TX_RESOURCE_FUEL
+        if t.fuel > 0 and self.fuel < 100:
+          self.fuel += 1
+          t.fuel -= 1
         else:
           t.transferComplete |= TX_RESOURCE_FUEL
 
-        if t.rounds > 0:
-          if self.rounds < 100:
-            self.rounds += 1
-            t.rounds -= 1
-          else:
-            t.transferComplete |= TX_RESOURCE_ROUNDS
+        if t.rounds > 0 and self.rounds < 100:
+          self.rounds += 1
+          t.rounds -= 1
         else:
           t.transferComplete |= TX_RESOURCE_ROUNDS
 
-        if t.torpedos > 0:
-          if self.torpedos < 100:
-            self.torpedos += 1
-            t.torpedos -= 1
-          else:
-            t.transferComplete |= TX_RESOURCE_TORPEDOS
+        if t.torpedos > 0 and self.torpedos < 100:
+          self.torpedos += 1
+          t.torpedos -= 1
         else:
           t.transferComplete |= TX_RESOURCE_TORPEDOS
 
