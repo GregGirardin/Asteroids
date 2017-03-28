@@ -6,11 +6,14 @@ Objective
 
 Scoring
 
-  Tanker making it safely away 300
-  Small Attacking aliens       200
-  Big aliens                   100
   Asteroids                     10
-  Cannons cost 1 and Torpedos cost 10
+  Big aliens                   100
+  Small Attacking aliens       250
+  Tanker making it safely away 200
+  Completing a wave            500 * wave
+
+  Cannon    -1
+  Torpedos -10
 
 Keys
   up = accelerate

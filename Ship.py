@@ -1,6 +1,6 @@
 from Constants import *
-from Shape import *
 from Vector import *
+from Shape import *
 from Utils import *
 from Particles import *
 from Tkinter import *

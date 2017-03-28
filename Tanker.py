@@ -24,7 +24,7 @@ class Tanker (WorldObject, Pilot):
          (-10, 10 ,-5, 0, None)]
 
     # start from the right side, going left.
-    p = Point (SCREEN_WIDTH + SCREEN_BUFFER - 1, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75))
+    p = Point (SCREEN_WIDTH + SCREEN_BUFFER - 1, random.uniform (SCREEN_HEIGHT * .1, SCREEN_HEIGHT * .9))
     self.shape = Shape (s)
 
     # resources available if ship contacts
@@ -37,16 +37,12 @@ class Tanker (WorldObject, Pilot):
     self.tPoint = None # Tractor point
 
     hList = [
-      Heuristic ("Face", HEUR_FACE, "Go",
-                 HeuristicFace (p.directionTo (Point (0, random.uniform (SCREEN_HEIGHT * .2, SCREEN_HEIGHT * .8))))),
-      Heuristic ("Go", HEUR_GO, "Stop",
-                 HeuristicGo (SPEED_HI, 100)),
-      Heuristic ("Stop", HEUR_STOP, "Wait",
-                 HeuristicStop ()),
-      Heuristic ("Wait", HEUR_WAIT, "Depart",
-                 HeuristicWait (500)),
-      Heuristic ("Depart", HEUR_GOTO, None,
-                 HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2), OBJECT_DIST_NEAR, APPROACH_TYPE_FAST))
+      Heuristic ("Face",   HEUR_FACE, "Go", HeuristicFace (PI)),
+      Heuristic ("Go",     HEUR_GO,   "Stop", HeuristicGo (SPEED_MED, 100)),
+      Heuristic ("Stop",   HEUR_STOP, "Wait", HeuristicStop ()),
+      Heuristic ("Wait",   HEUR_WAIT, "Face2", HeuristicWait (500)),
+      Heuristic ("Face2",  HEUR_FACE, "Depart", HeuristicFace (0)),
+      Heuristic ("Depart", HEUR_GO,   None, HeuristicGo (SPEED_HI, 1000) )
       ]
 
     Pilot.__init__ (self, hList)
@@ -89,9 +85,8 @@ class Tanker (WorldObject, Pilot):
       e.events.newEvent ("Refuel Complete", EVENT_DISPLAY_COUNT / 2, None)
       hList = [
         Heuristic ("Depart", HEUR_GOTO, None,
-                   HeuristicGoto (Point (SCREEN_WIDTH * 2, SCREEN_HEIGHT / 2),
-                                  OBJECT_DIST_NEAR, APPROACH_TYPE_FAST))
-        ]
+                   HeuristicGoto (Point (SCREEN_WIDTH * 1.1, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
+      ]
       self.setHlist (hList)
 
     if self.collisionObj:
@@ -116,9 +111,3 @@ class Tanker (WorldObject, Pilot):
       canvas.create_line (p.x, p.y,
                           self.tPoint.x + random.uniform (-2, 2),
                           self.tPoint.y + random.uniform (-2, 2), fill = "green")
-
-    if debugVectors:
-      canvas.create_line (p.x, p.y, p.x + self.v.dx()  * 20, p.y - self.v.dy()  * 20, arrow = tk.LAST, fill = "green")
-      canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y - self.tv.dy() * 20, arrow = tk.LAST)
-      canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y - self.cv.dy() * 20, arrow = tk.LAST, fill = "red")
-      canvas.create_oval (self.target.x - 2, self.target.y - 2, self.target.x + 2, self.target.y + 2)

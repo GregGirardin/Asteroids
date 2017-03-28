@@ -27,8 +27,6 @@ from Shape import *
 from Ship import *
 from Vector import *
 
-debugVectors = False
-
 class HeuristicGo ():
   def __init__(self, velocity, duration):
     self.hVelocity = velocity
@@ -42,16 +40,15 @@ class HeuristicStop():
   pass
 
 class HeuristicGoto ():
-  def __init__ (self, target, distance, at = APPROACH_TYPE_SLOW):
+  def __init__ (self, target, distance):
     self.target = target
     self.distance = distance # close do we need to get for success
     self.targetReached = False
-    self.approachType = at
 
 def HeuristicGotoRandom():
-  return (HeuristicGoto (Point (SCREEN_WIDTH  * random.uniform (.1, .9),
-                                SCREEN_HEIGHT * random.uniform (.1, .9)),
-                         OBJECT_DIST_MED, APPROACH_TYPE_FAST))
+  return (HeuristicGoto (Point (SCREEN_WIDTH  * random.random (),
+                                SCREEN_HEIGHT * random.random ()),
+                          OBJECT_DIST_MED))
 
 class HeuristicWait ():
   def __init__ (self, duration):
@@ -84,6 +81,11 @@ class Pilot ():
       self.currentH = hList [0]
     else:
       self.currentH = None
+
+    if debugVectors:
+      self.tv = Vector (0,0)
+      self.cv = Vector (0,0)
+      self.target = Point (0,0)
 
   def setHlist (self, hList):
     self.hList = hList
@@ -133,33 +135,25 @@ class Pilot ():
 
     target = h.target # target point
 
-    distToTarget = self.p.distanceTo (target) # determine ideal speed based on distance
-    targetSpeed = 0
+    # determine ideal vector based on distance
+    distToTarget = self.p.distanceTo (target)
+
     self.accel = 0
     self.spin = 0
 
-    if distToTarget > OBJECT_DIST_FAR:
-      targetSpeed = SPEED_HI
-    elif distToTarget > OBJECT_DIST_MED:
-      if h.distance == OBJECT_DIST_FAR:
-        return True
-      targetSpeed = SPEED_MED
-    elif distToTarget > OBJECT_DIST_NEAR:
-      if h.distance == OBJECT_DIST_MED:
-        return True
-      targetSpeed = SPEED_SLOW
-    else:
+    if ((distToTarget < OBJECT_DIST_FAR) and
+        ((h.distance == OBJECT_DIST_FAR) or
+         ((distToTarget > OBJECT_DIST_MED and h.distance == OBJECT_DIST_MED) or
+         (distToTarget < OBJECT_DIST_NEAR)))):
       return True
-    if h.approachType == APPROACH_TYPE_FAST:
-      targetSpeed = SPEED_HI
 
     dirToTarget = self.p.directionTo (target)
-    targetVector = Vector (targetSpeed, dirToTarget) # Ideal velocity vector from 'p' to target
+    targetVector = Vector (SPEED_HI * 1.5, dirToTarget) # hack. Long vector and drag smooth out ship.
     correctionVec = vectorDiff (self.v, targetVector) # vector to make our velocity approach targetVector
 
     # If we're pretty close to targetVector, just go straight
     # Continuous adjustment causes erratic behavior.
-    desiredVec = targetVector if correctionVec.magnitude < targetVector.magnitude / 3 else correctionVec
+    desiredVec = correctionVec # targetVector if correctionVec.magnitude < targetVector.magnitude / 3 else correctionVec
 
     da = angleTo (self.a, desiredVec.direction)
 
@@ -169,6 +163,10 @@ class Pilot ():
       self.accel = THRUST_HI
     elif dp < SPEED_MED:
       self.accel = THRUST_LOW
+
+    # Cheating. Drag allows us to stay behind target vector. Tricky to fix and this works.
+    # otherwise you have to deal with turning around to slow down if you're too fast.
+    self.v.magnitude *= .99
 
     if debugVectors:
       self.tv = targetVector

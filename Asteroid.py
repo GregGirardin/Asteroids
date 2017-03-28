@@ -59,7 +59,7 @@ class Asteroid (WorldObject):
           e.addObj (a)
 
       t = self.collisionObj.type
-      if t== OBJECT_TYPE_CANNON or t == OBJECT_TYPE_T_CANNON or t == OBJECT_TYPE_TORPEDO:
+      if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_T_CANNON or t == OBJECT_TYPE_TORPEDO:
         e.score += ASTEROID_POINTS
 
     if self.offScreen() or self.collisionObj:

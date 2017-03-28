@@ -3,7 +3,7 @@
 from Tanker import *
 from Aliens import *
 from Asteroid import *
-from Utils import *
+from Ship import *
 
 class displayEngine ():
   def __init__ (self):
@@ -58,7 +58,15 @@ class displayEngine ():
     # spawn stuff
     self.nextTanker -= 1
     if self.nextTanker < 0:
-      e.addObj (Tanker())
+      # make sure there's a ship. Could have just died. This prevents an infite score loophole
+      # if an attack alien is left flying around and you keep collecting Tanker safe points.
+      shipPresent = False
+      for obj in self.objects:
+        if obj.type == OBJECT_TYPE_SHIP:
+          shipPresent = True
+          break
+      if shipPresent:
+        e.addObj (Tanker())
       self.nextTanker = random.uniform (1000, 2000)
 
     if self.remainingAsteroids > 0:
@@ -91,6 +99,9 @@ class displayEngine ():
         if self.wave == NUM_WAVES:
           self.events.newEvent ("Congration. Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
         else:
+          self.score += WAVE_COMP_POINTS * self.wave
+          self.events.newEvent ("Wave complete bonus.", EVENT_DISPLAY_COUNT / 2, None)
+
           self.wave += 1
           t = "Wave %d" % self.wave
           self.events.newEvent (t, EVENT_DISPLAY_COUNT, self.newWave (self.wave))
