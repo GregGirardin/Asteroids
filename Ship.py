@@ -69,7 +69,7 @@ class Ship (WorldObject):
 
     if self.fireTorpedo is True:
       if self.torpedos > 0:
-        p = Torpedo (Point (self.p.x + 10 * math.cos (self.a), self.p.y - 10 * math.sin (self.a)),
+        p = Torpedo (Point (self.p.x + 20 * math.cos (self.a), self.p.y - 20 * math.sin (self.a)),
                             Vector (7, self.a).add (self.v),
                             150)
         e.addObj (p)

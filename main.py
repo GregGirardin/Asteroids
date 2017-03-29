@@ -164,7 +164,7 @@ def keyHandler (event):
     else:
       s.fireCannon = True
 
-  elif event.char == 't':
+  elif event.char == 't' or event.char == 'z':
     s.fireTorpedo = True
 
 e = displayEngine()
