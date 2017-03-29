@@ -1,11 +1,10 @@
-An asteroids type game.
+An Asteroids style game.
 
 Objective
 
   Shoot as many aliens and asteroids in the three waves.
   Iron asteroids can't be destroyed, but you can adjust their velocity with the cannon.
-  A refueling tanker will appear occasionally to replenish resources. Just fly next to it and it will
-  pull you in.
+  A refueling tanker will appear occasionally to replenish resources. Just fly next to it and it will pull you in.
 
 Scoring
 
@@ -24,4 +23,11 @@ Keys
   left = turn left
   right = turn right
   space = fire cannon
-  z = fire torpedo
+  z or t = fire torpedo
+
+
+If you have any suggestions let me know.
+
+Greg Girardin
+Nashua NH
+March, 2017
