@@ -16,47 +16,37 @@ class SmallAlien (WorldObject, Pilot):
     self.shape = Shape (s)
     self.cannon = 0
 
+    swl = SCREEN_WIDTH * .2
+    swh = SCREEN_WIDTH * .8
+    shl = SCREEN_HEIGHT * .2
+    shh = SCREEN_HEIGHT * .8
+
     hLists = [
         [ # randomly flys among a few points, stopping to shoot.
-          Heuristic ("1", HEUR_GOTO, "1a", HeuristicGotoRandom()),
-          Heuristic ("1a", HEUR_ATTACK, "2", HeuristicAttack (100)),
-          Heuristic ("2", HEUR_GOTO, "2a", HeuristicGotoRandom()),
-          Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (random.uniform (100, 400))),
-          Heuristic ("3", HEUR_GOTO, "3a", HeuristicGotoRandom()),
-          Heuristic ("3a", HEUR_ATTACK, "1", HeuristicAttack (100)),
+          Heuristic ("1", "1a", HeuristicGotoRandom()),
+          Heuristic ("1a", "2", HeuristicAttack (100)),
+          Heuristic ("2", "2a", HeuristicGotoRandom()),
+          Heuristic ("2a", "3", HeuristicAttack (random.uniform (100, 300))),
+          Heuristic ("3", "3a", HeuristicGotoRandom()),
+          Heuristic ("3a", "1", HeuristicAttack (100)),
         ],
         [ # this one flys around clockwise forever and shoots at you
-          Heuristic ("1", HEUR_GOTO, "1a",
-                     HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .25),
-                                    OBJECT_DIST_MED)),
-          Heuristic ("1a", HEUR_ATTACK, "2", HeuristicAttack (100)),
-          Heuristic ("2", HEUR_GOTO, "2a",
-                     HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .25),
-                                    OBJECT_DIST_MED)),
-          Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (100)),
-          Heuristic ("3", HEUR_GOTO, "3a",
-                     HeuristicGoto (Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT * .75),
-                                    OBJECT_DIST_MED)),
-          Heuristic ("3a", HEUR_ATTACK, "4", HeuristicAttack (100)),
-          Heuristic ("4", HEUR_GOTO, "4a",
-                     HeuristicGoto (Point (SCREEN_WIDTH * .25, SCREEN_HEIGHT * .75),
-                                    OBJECT_DIST_MED)),
-          Heuristic ("4a", HEUR_ATTACK, "1", HeuristicAttack (100)),
+          Heuristic ("1", "1a", HeuristicGoto (Point (swl, shl), OBJECT_DIST_MED)),
+          Heuristic ("1a", "2", HeuristicAttack (100)),
+          Heuristic ("2", "2a", HeuristicGoto (Point (swh, shl), OBJECT_DIST_MED)),
+          Heuristic ("2a", "3", HeuristicAttack (100)),
+          Heuristic ("3", "3a", HeuristicGoto (Point (swh, shh), OBJECT_DIST_MED)),
+          Heuristic ("3a", "4", HeuristicAttack (100)),
+          Heuristic ("4", "4a", HeuristicGoto (Point (swl, shh), OBJECT_DIST_MED)),
+          Heuristic ("4a", "1", HeuristicAttack (100)),
         ],
         [ # This one flys across this screen but shoots at you at a couple points.
-          Heuristic ("1", HEUR_GOTO, "2",
-                     HeuristicGoto (Point (SCREEN_WIDTH * .25, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                    OBJECT_DIST_MED)),
-          Heuristic ("2", HEUR_GOTO, "2a",
-                     HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                    OBJECT_DIST_MED)),
-          Heuristic ("2a", HEUR_ATTACK, "3", HeuristicAttack (300)),
-          Heuristic ("3", HEUR_GOTO, "3a",
-                     HeuristicGoto (Point (SCREEN_WIDTH * .75, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                    OBJECT_DIST_MED)),
-          Heuristic ("3a", HEUR_ATTACK, "4", HeuristicAttack (300)),
-          Heuristic ("4", HEUR_GOTO, None,
-                     HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (0, SCREEN_HEIGHT)), OBJECT_DIST_FAR))
+          Heuristic ("1", "2", HeuristicGoto (Point (swl, random.uniform (shl, shh)), OBJECT_DIST_MED)),
+          Heuristic ("2", "2a", HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (shl, shh)), OBJECT_DIST_MED)),
+          Heuristic ("2a", "3", HeuristicAttack (300)),
+          Heuristic ("3", "3a", HeuristicGoto (Point (swh, random.uniform (shl, shh)), OBJECT_DIST_MED)),
+          Heuristic ("3a", "4", HeuristicAttack (300)),
+          Heuristic ("4", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (0, SCREEN_HEIGHT)), OBJECT_DIST_FAR))
           ]
     ]
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
@@ -115,34 +105,23 @@ class BigAlien (WorldObject, Pilot):
 
     self.shape = Shape (s)
 
+    shl = SCREEN_HEIGHT * .25
+    shh = SCREEN_HEIGHT * .75
+
     hLists = [
       [
-        Heuristic ("i", HEUR_GOTO, "x",
-                   HeuristicGoto (Point (SCREEN_WIDTH * random.uniform (.3, .7),
-                                         random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_NEAR)),
-        Heuristic ("x", HEUR_GOTO, None,
-                   HeuristicGoto (Point (SCREEN_WIDTH * 1.1, random.uniform (-200, SCREEN_HEIGHT + 200)),
-                                  OBJECT_DIST_MED))
+        Heuristic ("i", "x", HeuristicGoto (Point (SCREEN_WIDTH * random.uniform (.3, .7), random.uniform (shl, shh)), OBJECT_DIST_NEAR)),
+        Heuristic ("x", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.1, random.uniform (-200, SCREEN_HEIGHT + 200)), OBJECT_DIST_MED))
       ],
       [
-        Heuristic ("i", HEUR_GOTO, "b",
-                   HeuristicGoto (Point (SCREEN_WIDTH / 4, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_NEAR)),
-        Heuristic ("b", HEUR_GOTO, "c",
-                   HeuristicGoto (Point (SCREEN_WIDTH / 2, random.uniform (SCREEN_HEIGHT * .1, SCREEN_HEIGHT * .9)),
-                                  OBJECT_DIST_MED)),
-        Heuristic ("c", HEUR_GOTO, None,
-                   HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (SCREEN_HEIGHT * .25, SCREEN_HEIGHT * .75)),
-                                  OBJECT_DIST_MED))
+        Heuristic ("i", "b", HeuristicGoto (Point (SCREEN_WIDTH / 4, random.uniform (shl, shh)), OBJECT_DIST_NEAR)),
+        Heuristic ("b", "c", HeuristicGoto (Point (SCREEN_WIDTH / 2, random.uniform (SCREEN_HEIGHT * .1, SCREEN_HEIGHT * .9)), OBJECT_DIST_MED)),
+        Heuristic ("c", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (shl, shh)), OBJECT_DIST_MED))
       ],
       [
-        Heuristic ("Face", HEUR_FACE, "Go", HeuristicFace (random.uniform (-.4, .4))), # face right ish
-        Heuristic ("Go", HEUR_GO, "Depart", HeuristicGo (SPEED_HI, random.uniform (200, 700))),
-       # Heuristic ("Stop", HEUR_STOP, "Wait", HeuristicStop ()),
-       # Heuristic ("Wait", HEUR_WAIT, "Depart", HeuristicWait (100)),
-        Heuristic ("Depart", HEUR_GOTO, None,
-                   HeuristicGoto (Point (SCREEN_WIDTH * 1.2, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
+        Heuristic ("f", "g", HeuristicFace (random.uniform (-.4, .4))), # face right ish
+        Heuristic ("g", "d", HeuristicGo (SPEED_HI, random.uniform (200, 700))),
+        Heuristic ("d", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.2, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
       ]]
 
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
@@ -158,8 +137,8 @@ class BigAlien (WorldObject, Pilot):
       for _ in  range (1, int (30 + random.random() * 10)):
         p = SmokeParticle (Point (self.p.x, self.p.y),
                            Vector (random.random(), TAU * random.random ()).add (self.v),
-                           30 + random.random() * 20,
-                           (random.random() / 2 + 2))
+                           random.uniform (30, 50),
+                           random.uniform (2, 2.5))
         e.addObj (p)
       t = self.collisionObj.type
       if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:

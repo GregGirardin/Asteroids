@@ -7,10 +7,10 @@ from Utils import *
 class Asteroid (WorldObject):
   def __init__ (self, radius, iron = False):
 
-    radii = 6 + int (random.random() * 5)
+    radii = 6 + random.randrange (0, 5)
     r = []
     for _ in range (0, radii):
-      r.append (radius + random.random() * 5)
+      r.append (radius + random.uniform (0, 5))
     r.append (r [0])
 
     s = []
@@ -45,7 +45,7 @@ class Asteroid (WorldObject):
                           v,
                           radius,
                           mass = m)
-    self.spin = (random.random() - .5) / 10
+    self.spin = random.uniform (-.05, .05)
     self.iron = iron
 
   def update (self, e):
@@ -81,7 +81,7 @@ class Asteroid (WorldObject):
             else:
               c.p.move (Vector (adjustment, dirToUs - PI))
       else:
-        for _ in  range (1, int (10 + random.random() * 10)):
+        for _ in  range (1, random.randrange (10, 20)):
           p = SmokeParticle (Point (self.p.x, self.p.y),
                              Vector (2 * random.random(), random.uniform (0, TAU)),
                              random.randrange (10, 20),

@@ -39,11 +39,14 @@ class displayEngine ():
 
   def update (self):
     # collision detection (fix wasteful checks)
-    for obj1 in self.objects:
-      obj1.collisionObj = None
-    for obj1 in self.objects:
-      for obj2 in self.objects:
-        if obj2 is not obj1:
+    for o in self.objects:
+      o.collisionObj = None
+
+    for i in range (0, len (self.objects) - 1):
+      for j in range (i + 1, len (self.objects)):
+        if i != j:
+          obj1 = self.objects [i]
+          obj2 = self.objects [j]
           if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
             cDist = obj1.collisionRadius + obj2.collisionRadius
             if obj1.p.distanceTo (obj2.p) < cDist:
@@ -52,10 +55,11 @@ class displayEngine ():
                 obj1.collisionObj = obj2
               if not obj2.collisionObj or obj1.mass > obj2.collisionObj.mass:
                 obj2.collisionObj = obj1
+
     # update objects
-    for obj in self.objects:
-      if obj.update (self) == False:
-        self.objects.remove (obj)
+    for o in self.objects:
+      if o.update (self) == False:
+        self.objects.remove (o)
 
     # spawn stuff
     self.nextTanker -= 1

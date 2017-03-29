@@ -32,12 +32,47 @@ class HeuristicGo ():
     self.hVelocity = velocity
     self.hDuration = duration
 
+  def update (self, s, e):
+    if self.hDuration > 0:
+      self.hDuration -= 1
+      if s.v.magnitude < self.hVelocity:
+        s.accel = THRUST_MED
+      else:
+        s.accel = 0
+      return False
+    else:
+      return True
+
 class HeuristicFace():
   def __init__(self, angle):
     self.hAngle = angle
 
+  def update (self, s, e):
+    dirTo = angleTo (s.a, self.hAngle)
+    if math.fabs (dirTo) > .05:
+      s.spin = dirTo / 20
+      return False
+    else:
+      s.spin = 0
+      return True
+
 class HeuristicStop():
-  pass
+  def update (self, s, e):
+    if s.v.magnitude > SPEED_SLOW / 20:
+      # turn around
+      targetDir = angleNorm (s.v.direction + PI)
+      dirTo = angleTo (s.a, targetDir)
+      if math.fabs (dirTo) > .05:
+        s.accel = 0
+        s.spin = dirTo / 20
+      else:
+        s.accel = THRUST_HI
+        s.spin = 0
+      return False
+
+    s.accel = 0
+    s.spin = 0
+    return True
 
 class HeuristicGoto ():
   def __init__ (self, target, distance):
@@ -45,14 +80,62 @@ class HeuristicGoto ():
     self.distance = distance # close do we need to get for success
     self.targetReached = False
 
+  def update (self, s, e):
+    # determine ideal vector based on distance
+    distToTarget = s.p.distanceTo (self.target)
+
+    s.accel = 0
+    s.spin = 0
+
+    if ((distToTarget < OBJECT_DIST_FAR) and
+        ((self.distance == OBJECT_DIST_FAR) or
+         ((distToTarget > OBJECT_DIST_MED and self.distance == OBJECT_DIST_MED) or
+         (distToTarget < OBJECT_DIST_NEAR)))):
+      return True
+
+    dirToTarget = s.p.directionTo (self.target)
+    targetVector = Vector (SPEED_HI * 1.5, dirToTarget) # hack. Long vector and drag smooth out ship.
+    correctionVec = vectorDiff (s.v, targetVector) # vector to make our velocity approach targetVector
+
+    # If we're pretty close to targetVector, just go straight
+    # Continuous adjustment causes erratic behavior.
+    desiredVec = correctionVec # targetVector if correctionVec.magnitude < targetVector.magnitude / 3 else correctionVec
+
+    da = angleTo (s.a, desiredVec.direction)
+
+    s.spin = da / 20
+    dp = dot (s.v, desiredVec) # component of velocity in the direction of correctionVec
+    if dp < SPEED_HI:
+      s.accel = THRUST_HI
+    elif dp < SPEED_MED:
+      s.accel = THRUST_LOW
+
+    # Cheating. Drag allows us to stay behind target vector. Tricky to fix and this works.
+    # otherwise you have to deal with turning around to slow down if you're too fast.
+    s.v.magnitude *= .99
+
+    if debugVectors:
+      s.tv = targetVector
+      s.cv = desiredVec
+      s.target = target
+
+    return False
+
 def HeuristicGotoRandom():
-  return (HeuristicGoto (Point (SCREEN_WIDTH  * random.random (),
-                                SCREEN_HEIGHT * random.random ()),
-                          OBJECT_DIST_MED))
+  return (HeuristicGoto (Point (SCREEN_WIDTH  * random.random (), SCREEN_HEIGHT * random.random ()), OBJECT_DIST_MED))
 
 class HeuristicWait ():
   def __init__ (self, duration):
     self.hDuration = duration
+
+  def update (self, s, e):
+    s.accel = 0
+    s.spin = 0
+
+    self.hDuration -= 1
+    if self.hDuration < 0:
+      return True
+    return False
 
 class HeuristicAttack ():
   def __init__ (self, duration = 50):
@@ -62,12 +145,43 @@ class HeuristicAttack ():
     self.aangleOffset = random.uniform (-.2, .2) # shoot a bit randomly
     self.ttNextAttack = 1
 
-####
+  def update (self, s, e):
+    self.durationCounter -= 1
+    if self.durationCounter <= 0:
+      self.durationCounter = self.duration
+      return True
+
+    if self.attackState == ATTACK_INIT:
+      if self.ttNextAttack == 0:
+        self.attackState = ATTACK_ALIGN
+        self.aangleOffset = random.uniform (-.2, .2) # shoot a bit randomly
+      else:
+        self.ttNextAttack -= 1
+
+    if self.attackState == ATTACK_ALIGN:
+      sh = None
+      for obj in e.objects:
+        if obj.type == OBJECT_TYPE_SHIP:
+          sh = obj
+          break
+      if not sh:
+        return True
+
+      goalDir = dir (sh.p.x - s.p.x, sh.p.y - s.p.y) + self.aangleOffset
+      aToGoal = angleTo (s.a, goalDir)
+
+      if math.fabs (aToGoal) < .1:
+        s.cannon = 1 # cannon handled in update
+        self.attackState = ATTACK_INIT
+        self.ttNextAttack = random.randrange (20, 70)
+      else:
+        s.spin = aToGoal / 10
+
+    return False
 
 class Heuristic ():
-  def __init__ (self, id, type, next, heuristic):
+  def __init__ (self, id, next, heuristic):
     self.id = id
-    self.type = type
     self.next = next
     self.heuristic = heuristic
 
@@ -75,7 +189,6 @@ class Heuristic ():
 class Pilot ():
   def __init__ (self, hList):
     self.hList = hList
-    self.currentStateCount = 0
 
     if self.hList:
       self.currentH = hList [0]
@@ -91,159 +204,12 @@ class Pilot ():
     self.hList = hList
     self.currentH = hList [0]
 
-  def handleGo (self, e):
-    h = self.currentH.heuristic
-    if h.hDuration > 0:
-      h.hDuration -= 1
-      if self.v.magnitude < h.hVelocity:
-        self.accel = THRUST_MED
-      else:
-        self.accel = 0
-      return False
-    else:
-      return True
-
-  def handleFace (self, e):
-    h = self.currentH.heuristic
-    dirTo = angleTo (self.a, h.hAngle)
-    if math.fabs (dirTo) > .05:
-      self.spin = dirTo / 20
-      return False
-    else:
-      self.spin = 0
-      return True
-
-  def handleStop (self, e):
-    if self.v.magnitude > SPEED_SLOW / 20:
-      # turn around
-      targetDir = angleNorm (self.v.direction + PI)
-      dirTo = angleTo (self.a, targetDir)
-      if math.fabs (dirTo) > .05:
-        self.accel = 0
-        self.spin = dirTo / 20
-      else:
-        self.accel = THRUST_HI
-        self.spin = 0
-      return False
-
-    self.accel = 0
-    self.spin = 0
-    return True
-
-  def handleGoto (self, e):
-    h = self.currentH.heuristic
-
-    target = h.target # target point
-
-    # determine ideal vector based on distance
-    distToTarget = self.p.distanceTo (target)
-
-    self.accel = 0
-    self.spin = 0
-
-    if ((distToTarget < OBJECT_DIST_FAR) and
-        ((h.distance == OBJECT_DIST_FAR) or
-         ((distToTarget > OBJECT_DIST_MED and h.distance == OBJECT_DIST_MED) or
-         (distToTarget < OBJECT_DIST_NEAR)))):
-      return True
-
-    dirToTarget = self.p.directionTo (target)
-    targetVector = Vector (SPEED_HI * 1.5, dirToTarget) # hack. Long vector and drag smooth out ship.
-    correctionVec = vectorDiff (self.v, targetVector) # vector to make our velocity approach targetVector
-
-    # If we're pretty close to targetVector, just go straight
-    # Continuous adjustment causes erratic behavior.
-    desiredVec = correctionVec # targetVector if correctionVec.magnitude < targetVector.magnitude / 3 else correctionVec
-
-    da = angleTo (self.a, desiredVec.direction)
-
-    self.spin = da / 20
-    dp = dot (self.v, desiredVec) # component of velocity in the direction of correctionVec
-    if dp < SPEED_HI:
-      self.accel = THRUST_HI
-    elif dp < SPEED_MED:
-      self.accel = THRUST_LOW
-
-    # Cheating. Drag allows us to stay behind target vector. Tricky to fix and this works.
-    # otherwise you have to deal with turning around to slow down if you're too fast.
-    self.v.magnitude *= .99
-
-    if debugVectors:
-      self.tv = targetVector
-      self.cv = desiredVec
-      self.target = target
-
-    return False
-
-  def handleWait (self, e):
-    h = self.currentH.heuristic
-    self.accel = 0
-    self.spin = 0
-
-    h.hDuration -= 1
-    if h.hDuration < 0:
-      return True
-    return False
-
-  def handleAttack (self, e):
-    h = self.currentH.heuristic
-
-    h.durationCounter -= 1
-    if h.durationCounter <= 0:
-      h.durationCounter = h.duration
-      return True
-
-    if h.attackState == ATTACK_INIT:
-      if h.ttNextAttack == 0:
-        h.attackState = ATTACK_ALIGN
-        h.aangleOffset = random.uniform (-.2, .2) # shoot a bit randomly
-      else:
-        h.ttNextAttack -= 1
-
-    if h.attackState == ATTACK_ALIGN:
-      s = None
-      for obj in e.objects:
-        if obj.type == OBJECT_TYPE_SHIP:
-          s = obj
-          break
-      if not s:
-        return True
-
-      goalDir = dir (s.p.x - self.p.x, s.p.y - self.p.y) + h.aangleOffset
-      aToGoal = angleTo (self.a, goalDir)
-
-      if math.fabs (aToGoal) < .1:
-        self.cannon = 1 # cannon handled in update
-        h.attackState = ATTACK_INIT
-        h.ttNextAttack = random.randrange (20, 70)
-      else:
-        self.spin = aToGoal / 10
-
-    # are we facing sort of in the direction of the Ship
-    return False
-
   def pilot (self, e):
-    '''
-    Adjust, thrust, direction, and cannon based on heuristics.
-    '''
+    # Adjust, thrust, direction, and cannon based on heuristics.
     if self.hList == None or self.currentH == None:
       return
-    self.currentStateCount += 1
 
-    s = False
-
-    if self.currentH.type == HEUR_GO:
-      s = self.handleGo (e)
-    if self.currentH.type == HEUR_FACE:
-      s = self.handleFace (e)
-    if self.currentH.type == HEUR_STOP:
-      s = self.handleStop (e)
-    if self.currentH.type == HEUR_GOTO:
-      s = self.handleGoto (e)
-    elif self.currentH.type == HEUR_WAIT:
-      s = self.handleWait (e)
-    elif self.currentH.type == HEUR_ATTACK:
-      s = self.handleAttack (e)
+    s = self.currentH.heuristic.update (self, e)
 
     if s == True:
       for h in self.hList:

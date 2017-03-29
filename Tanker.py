@@ -28,21 +28,21 @@ class Tanker (WorldObject, Pilot):
     self.shape = Shape (s)
 
     # resources available if ship contacts
-    self.fuel = random.uniform (20.0, 80.0)
-    self.torpedos = random.uniform (30.0, 60.0)
-    self.rounds = random.uniform (50.0, 70.0)
+    self.fuel = random.uniform (50.0, 100.0)
+    self.rounds = random.uniform (50.0, 100.0)
+    self.torpedos = random.uniform (50.0, 100.0)
 
     self.refuelComplete = False
     self.transferComplete = 0
     self.tPoint = None # Tractor point
 
     hList = [
-      Heuristic ("Face",   HEUR_FACE, "Go", HeuristicFace (PI)),
-      Heuristic ("Go",     HEUR_GO,   "Stop", HeuristicGo (SPEED_MED, 100)),
-      Heuristic ("Stop",   HEUR_STOP, "Wait", HeuristicStop ()),
-      Heuristic ("Wait",   HEUR_WAIT, "Face2", HeuristicWait (500)),
-      Heuristic ("Face2",  HEUR_FACE, "Depart", HeuristicFace (0)),
-      Heuristic ("Depart", HEUR_GO,   None, HeuristicGo (SPEED_HI, 1000) )
+      Heuristic ("f",  "g",  HeuristicFace (PI)),
+      Heuristic ("g",  "s",  HeuristicGo (SPEED_MED, 100)),
+      Heuristic ("s",  "w",  HeuristicStop ()),
+      Heuristic ("w",  "f2", HeuristicWait (500)),
+      Heuristic ("f2", "d",  HeuristicFace (0)),
+      Heuristic ("d",  None, HeuristicGo (SPEED_HI, 1000) )
       ]
 
     Pilot.__init__ (self, hList)
@@ -82,7 +82,7 @@ class Tanker (WorldObject, Pilot):
       self.refuelComplete = True
       e.events.newEvent ("Refuel Complete", EVENT_DISPLAY_COUNT / 2, None)
       hList = [
-        Heuristic ("Depart", HEUR_GOTO, None,
+        Heuristic ("Depart", None,
                    HeuristicGoto (Point (SCREEN_WIDTH * 1.1, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
       ]
       self.setHlist (hList)
