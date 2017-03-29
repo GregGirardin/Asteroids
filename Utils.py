@@ -4,19 +4,18 @@ from Vector import *
 
 class WorldObject ():
   # Attributes every object has.
-  def __init__ (self, type, p=None, a=0.0, v=None, collisionRadius=0):
+  def __init__ (self, type, p, a=0.0, v=None, collisionRadius=0, mass=1.0):
     if not v:
       v = Vector (0, 0)
     self.v = v
     self.spin = 0.0
-    if not p:
-      p = Point (SCREEN_HEIGHT / 2, SCREEN_WIDTH / 2)
     self.p = p # position
     self.a = a # angle
     self.type = type
     self.accel = 0.0
     self.collisionRadius = collisionRadius
     self.collisionObj = None
+    self.mass = mass
 
   def offScreen (self):
     if self.p.x < -SCREEN_BUFFER or self.p.x > SCREEN_WIDTH + SCREEN_BUFFER or \
@@ -32,8 +31,8 @@ class WorldObject ():
     elif self.a > TAU:
       self.a -= TAU
 
-    self.v.add (Vector (self.accel, self.a))
     self.p.move (self.v)
+    self.v.add (Vector (self.accel, self.a))
 
 # Could try to make this a WorldObject if that's cleaner
 class Event ():

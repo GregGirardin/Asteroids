@@ -30,11 +30,7 @@ class SmokeParticle (WorldObject):
 class CanonParticle (WorldObject):
   def __init__ (self, p, v, ttl, type = OBJECT_TYPE_CANNON):
     self.ttl = ttl
-    size = 1
-    s = [(-size,-size, size, size, None),
-         (-size, size, size,-size, None)]
-    self.shape = Shape (s)
-    WorldObject.__init__ (self, type, p, 0, v, 2)
+    WorldObject.__init__ (self, type, p, 0, v, 2, CANNON_MASS)
 
   def update (self, e):
     WorldObject.update (self, e)
@@ -51,14 +47,14 @@ class CanonParticle (WorldObject):
       return False
 
   def draw (self, canvas, p, a):
-    self.shape.draw (canvas, p, a)
+    canvas.create_oval (p.x - 1, p.y - 1, p.x + 1, p.y + 1)
 
 class Torpedo (WorldObject):
   def __init__ (self, p, v, ttl, radius = 5):
     self.ttl = ttl
     self.radius = radius
     self.age = 0
-    WorldObject.__init__ (self, OBJECT_TYPE_TORPEDO, p, 0, v, radius)
+    WorldObject.__init__ (self, OBJECT_TYPE_TORPEDO, p, 0, v, radius, TORPEDO_MASS)
 
   def update (self, e):
     WorldObject.update (self, e)

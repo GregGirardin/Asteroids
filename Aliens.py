@@ -61,7 +61,7 @@ class SmallAlien (WorldObject, Pilot):
     ]
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
     Pilot.__init__ (self, hLists [random.randint(0, 2)])
-    WorldObject.__init__ (self, OBJECT_TYPE_ALIEN, p, (random.random() - .5) / 4, None, 5)
+    WorldObject.__init__ (self, OBJECT_TYPE_ALIEN, p, (random.random() - .5) / 4, None, 5, mass=SMALL_ALIEN_MASS)
 
   def update (self, e):
     Pilot.pilot (self, e)
@@ -148,7 +148,7 @@ class BigAlien (WorldObject, Pilot):
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
 
     Pilot.__init__ (self, hLists [random.randint (0, 2)])
-    WorldObject.__init__ (self, OBJECT_TYPE_ALIEN, p, (random.random() - .5) / 4, None, 12)
+    WorldObject.__init__ (self, OBJECT_TYPE_ALIEN, p, (random.random() - .5) / 4, None, 12, mass=BIG_ALIEN_MASS)
 
   def update (self, e):
     Pilot.pilot (self, e)

@@ -10,9 +10,9 @@ class Vector ():
     self.direction = d
 
   # add vector v
-  def add (self, v, mod = True):
-    cx = self.dx() + v.magnitude * math.cos (v.direction)
-    cy = self.dy() - v.magnitude * math.sin (v.direction)
+  def add (self, v, mod = True, factor = 1.0):
+    cx = self.dx() + v.magnitude * math.cos (v.direction) * factor
+    cy = self.dy() - v.magnitude * math.sin (v.direction) * factor
     magnitude = math.sqrt (cx ** 2 + cy ** 2)
     direction = dir (cx, cy)
     if mod:
@@ -42,6 +42,10 @@ class Vector ():
     self.direction = dir (-self.dx(), self.dy())
   def flipy (self):
     self.direction = dir (self.dx(), -self.dy())
+
+  def dot (self, angle):
+    theta = math.fabs (self.direction - angle)
+    return self.magnitude * math.cos (theta)
 
 # compute direction from dx/dy
 def dir (dx, dy):

@@ -76,11 +76,11 @@ class Shape ():
       tlines.append (line.translate (p, a))
     return tlines
 
-  def draw (self, canvas, p, a, color = "black"):
+  def draw (self, canvas, p, a, color = "black", width = 1):
     tlines = self.translate (p, a)
 
     for tline in tlines:
-      canvas.create_line (tline.p1.x, tline.p1.y, tline.p2.x, tline.p2.y, fill = color)
+      canvas.create_line (tline.p1.x, tline.p1.y, tline.p2.x, tline.p2.y, fill = color, width = width)
 
 
   def move (self, v): # v is a vector

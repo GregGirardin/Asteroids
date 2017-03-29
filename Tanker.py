@@ -53,8 +53,6 @@ class Tanker (WorldObject, Pilot):
     WorldObject.update (self, e)
 
     if self.offScreen():
-      e.events.newEvent ("Tanker safe bonus", EVENT_DISPLAY_COUNT / 2, None)
-      e.score += TANKER_SAFE_POINTS
       return False
 
     self.tPoint = None
@@ -101,6 +99,13 @@ class Tanker (WorldObject, Pilot):
 
         if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
           e.events.newEvent ("You destroyed the SS Vinoski! LOL", EVENT_DISPLAY_COUNT, None)
+        else:
+          e.events.newEvent ("Tanker destroyed", EVENT_DISPLAY_COUNT / 2, None)
+
+        if e.score > TANKER_DESTROYED_POINTS:
+          e.score -= TANKER_DESTROYED_POINTS
+        else:
+          e.score = 0
         return False
 
     return True

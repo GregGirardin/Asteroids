@@ -9,11 +9,11 @@ Scoring
   Asteroids                     10
   Big aliens                   100
   Small Attacking aliens       250
-  Tanker making it safely away 200
   Completing a wave            500 * wave
 
   Cannon    -1
   Torpedos -10
+  Tanker destroyed -100
 
 Keys
   up = accelerate

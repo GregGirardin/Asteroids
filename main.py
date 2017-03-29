@@ -45,11 +45,13 @@ class displayEngine ():
       for obj2 in self.objects:
         if obj2 is not obj1:
           if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
-            rad = obj1.collisionRadius + obj2.collisionRadius
-            if obj1.p.distanceTo (obj2.p) < rad:
-              obj1.collisionObj = obj2
-              obj2.collisionObj = obj1
-
+            cDist = obj1.collisionRadius + obj2.collisionRadius
+            if obj1.p.distanceTo (obj2.p) < cDist:
+              # if multiple collisions, greatest mass gets priority
+              if not obj1.collisionObj or obj2.mass > obj1.collisionObj.mass:
+                obj1.collisionObj = obj2
+              if not obj2.collisionObj or obj1.mass > obj2.collisionObj.mass:
+                obj2.collisionObj = obj1
     # update objects
     for obj in self.objects:
       if obj.update (self) == False:
@@ -58,30 +60,22 @@ class displayEngine ():
     # spawn stuff
     self.nextTanker -= 1
     if self.nextTanker < 0:
-      # make sure there's a ship. Could have just died. This prevents an infite score loophole
-      # if an attack alien is left flying around and you keep collecting Tanker safe points.
-      shipPresent = False
-      for obj in self.objects:
-        if obj.type == OBJECT_TYPE_SHIP:
-          shipPresent = True
-          break
-      if shipPresent:
-        e.addObj (Tanker())
+      e.addObj (Tanker())
       self.nextTanker = random.uniform (1000, 2000)
 
     if self.remainingAsteroids > 0:
       self.nextAsteroid -= 1
       if self.nextAsteroid < 0:
         self.remainingAsteroids -= 1
-        self.nextAsteroid = random.uniform (100, 200)
-        e.addObj (Asteroid (random.uniform (10, 50)))
+        self.nextAsteroid = random.uniform (120, 220)
+        e.addObj (Asteroid (random.uniform (10, 50), iron = True if random.random() < .2 else False))
 
     if self.remainingAliens > 0:
       self.nextAlien -= 1
       if self.nextAlien < 0:
         self.remainingAliens -= 1
-        self.nextAlien = random.uniform (100, 200)
-        if random.random() < .3 + .15 * self.wave:
+        self.nextAlien = random.uniform (130, 250)
+        if random.random() < .2 + .15 * self.wave: # more of these with each level
           a = SmallAlien()
         else:
           a = BigAlien()
