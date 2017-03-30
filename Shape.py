@@ -82,7 +82,6 @@ class Shape ():
     for tline in tlines:
       canvas.create_line (tline.p1.x, tline.p1.y, tline.p2.x, tline.p2.y, fill = color, width = width)
 
-
   def move (self, v): # v is a vector
     self.p.x += v.magnitude * math.cos (v.direction)
     self.p.y -= v.magnitude * math.sin (v.direction)

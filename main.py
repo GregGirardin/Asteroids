@@ -28,8 +28,8 @@ class displayEngine ():
     self.wave = wave
     self.waveComplete = False
     self.nextTanker = random.uniform (500, 2000)
-    self.nextAlien = random.uniform (100, 200)
-    self.nextAsteroid = random.uniform (100, 200)
+    self.nextAlien = random.uniform (200, 300)
+    self.nextAsteroid = random.uniform (10, 100)
 
   def gameOver (self):
     if self.score > self.highScore:
@@ -39,22 +39,24 @@ class displayEngine ():
 
   def update (self):
     # collision detection (fix wasteful checks)
-    for o in self.objects:
-      o.collisionObj = None
-
     for i in range (0, len (self.objects) - 1):
       for j in range (i + 1, len (self.objects)):
         if i != j:
           obj1 = self.objects [i]
           obj2 = self.objects [j]
           if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
-            cDist = obj1.collisionRadius + obj2.collisionRadius
-            if obj1.p.distanceTo (obj2.p) < cDist:
-              # if multiple collisions, greatest mass gets priority
-              if not obj1.collisionObj or obj2.mass > obj1.collisionObj.mass:
-                obj1.collisionObj = obj2
-              if not obj2.collisionObj or obj1.mass > obj2.collisionObj.mass:
-                obj2.collisionObj = obj1
+            colDist = obj1.colRadius + obj2.colRadius
+            actDist = obj1.p.distanceTo (obj2.p)
+            if actDist < colDist:
+              adjJust = colDist - actDist
+              dir = obj2.p.directionTo (obj1.p)
+              spd = obj2.v.dot (dir) + obj1.v.dot (dir + PI) # velocity towards each other.
+              if spd > 0:
+                # make sure they're moving toward each other
+                c = CollisionObject (obj2, Vector (spd * obj2.mass / obj1.mass, dir), adjJust)
+                obj1.colList.append (c)
+                c = CollisionObject (obj1, Vector (spd * obj1.mass / obj2.mass, dir - PI), adjJust)
+                obj2.colList.append (c)
 
     # update objects
     for o in self.objects:
@@ -133,7 +135,6 @@ class displayEngine ():
 
     # events
     self.events.draw (self)
-
     self.root.update()
 
 def leftHandler (event):

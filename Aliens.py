@@ -57,6 +57,9 @@ class SmallAlien (WorldObject, Pilot):
     Pilot.pilot (self, e)
     WorldObject.update (self, e)
 
+    if self.offScreen():
+      return False
+
     if self.cannon > 0:
       self.cannon -= 1
       p = CanonParticle (Point (self.p.x + 10 * math.cos (self.a),
@@ -64,16 +67,23 @@ class SmallAlien (WorldObject, Pilot):
                          Vector (7, self.a), 120, type = OBJECT_TYPE_AL_CANNON)
       e.addObj (p)
 
-    if self.collisionObj:
-      for _ in  range (1, int (10 + random.random() * 10)):
-        p = SmokeParticle (Point (self.p.x, self.p.y),
-                           Vector (random.random(), TAU * random.random ()).add (self.v),
-                           20 + random.random() * 20,
-                           (random.random() / 2 + 2))
-        e.addObj (p)
-      t = self.collisionObj.type
-      if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
-        e.score += SMALL_ALIEN_POINTS
+    while self.colList:
+      c = self.colList.pop(0) # just process one
+      if c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False:
+        if self.v.magnitude > SPEED_HI:
+          self.v.magnitude = SPEED_HI
+        self.p.move (Vector (c.d / 2, c.i.direction))
+      else:
+        for _ in  range (1, random.randrange (10, 20)):
+          p = SmokeParticle (Point (self.p.x, self.p.y),
+                             Vector (random.random(), TAU * random.random ()).add (self.v),
+                             20 + random.random() * 20,
+                             (random.random() / 2 + 2))
+          e.addObj (p)
+        t = c.o.type
+        if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
+          e.score += SMALL_ALIEN_POINTS
+        return False
 
     if self.accel > 0:
       p = SmokeParticle (Point (self.p.x, self.p.y).move (Vector (3, self.a + PI)),
@@ -81,9 +91,6 @@ class SmallAlien (WorldObject, Pilot):
                          random.uniform (5, 10),
                          self.accel * random.uniform (15, 30))
       e.addObj (p)
-
-    if self.offScreen() or self.collisionObj:
-      return False
 
     return True
 
@@ -133,16 +140,27 @@ class BigAlien (WorldObject, Pilot):
     Pilot.pilot (self, e)
     WorldObject.update (self, e)
 
-    if self.collisionObj:
-      for _ in  range (1, int (30 + random.random() * 10)):
-        p = SmokeParticle (Point (self.p.x, self.p.y),
-                           Vector (random.random(), TAU * random.random ()).add (self.v),
-                           random.uniform (30, 50),
-                           random.uniform (2, 2.5))
-        e.addObj (p)
-      t = self.collisionObj.type
-      if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
-        e.score += BIG_ALIEN_POINTS
+    if self.offScreen():
+      return False
+
+    while self.colList:
+      c = self.colList.pop(0) # just process one
+      if c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False:
+        if self.v.magnitude > SPEED_HI:
+          self.v.magnitude = SPEED_HI
+        self.p.move (Vector (c.d / 2, c.i.direction))
+      else:
+        for _ in  range (1, random.randrange (30, 40)):
+          p = SmokeParticle (Point (self.p.x, self.p.y),
+                             Vector (random.random(), TAU * random.random ()).add (self.v),
+                             random.uniform (30, 50),
+                             random.uniform (2, 2.5))
+          e.addObj (p)
+        t = c.o.type
+        if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
+          e.score += BIG_ALIEN_POINTS
+
+        return False
 
     if self.accel > 0:
       p = SmokeParticle (Point (self.p.x, self.p.y).move (Vector (7, self.a + PI)),
@@ -150,9 +168,6 @@ class BigAlien (WorldObject, Pilot):
                          random.uniform (5, 10),
                          self.accel * random.uniform (15, 30))
       e.addObj (p)
-
-    if self.offScreen() or self.collisionObj:
-      return False
 
     return True
 

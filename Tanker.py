@@ -82,13 +82,13 @@ class Tanker (WorldObject, Pilot):
       self.refuelComplete = True
       e.events.newEvent ("Refuel Complete", EVENT_DISPLAY_COUNT / 2, None)
       hList = [
-        Heuristic ("Depart", None,
-                   HeuristicGoto (Point (SCREEN_WIDTH * 1.1, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
+        Heuristic ("Depart", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.1, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
       ]
       self.setHlist (hList)
 
-    if self.collisionObj:
-      t = self.collisionObj.type
+    while self.colList:
+      c = self.colList.pop(0)
+      t = c.o.type
       if t != OBJECT_TYPE_SHIP:
         for _ in range (1, int (random.uniform (20, 30))):
           p = SmokeParticle (Point (self.p.x, self.p.y),
@@ -102,8 +102,8 @@ class Tanker (WorldObject, Pilot):
         else:
           e.events.newEvent ("Tanker destroyed", EVENT_DISPLAY_COUNT / 2, None)
 
-        if e.score > TANKER_DESTROYED_POINTS:
-          e.score -= TANKER_DESTROYED_POINTS
+        if e.score > TANKER_DESTROYED_COST:
+          e.score -= TANKER_DESTROYED_COST
         else:
           e.score = 0
         return False

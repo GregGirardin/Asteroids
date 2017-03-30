@@ -4,7 +4,7 @@ from Vector import *
 
 class WorldObject ():
   # Attributes every object has.
-  def __init__ (self, type, p, a=0.0, v=None, collisionRadius=0, mass=1.0):
+  def __init__ (self, type, p, a=0.0, v=None, colRadius=0, mass=1.0, weapon = False):
     if not v:
       v = Vector (0, 0)
     self.v = v
@@ -13,8 +13,9 @@ class WorldObject ():
     self.a = a # angle
     self.type = type
     self.accel = 0.0
-    self.collisionRadius = collisionRadius
-    self.collisionObj = None
+    self.weapon = weapon # Explode even on slow contact
+    self.colRadius = colRadius
+    self.colList = [] # a list of CollisionObject
     self.mass = mass
 
   def offScreen (self):
@@ -30,11 +31,15 @@ class WorldObject ():
       self.a += TAU
     elif self.a > TAU:
       self.a -= TAU
-
     self.p.move (self.v)
     self.v.add (Vector (self.accel, self.a))
 
-# Could try to make this a WorldObject if that's cleaner
+class CollisionObject ():
+  def __init__(self, o, i, d):
+    self.o = o # the object
+    self.i = i # impulse = speed * their mass / my mass, dir
+    self.d = d # distance between objects.
+
 class Event ():
   def __init__(self, msg, dur, action):
     self.msg = msg
@@ -42,7 +47,6 @@ class Event ():
     self.action = action # callback
 
 class gameEvents ():
-
   def __init__(self):
     self.eventList = []
 
@@ -58,7 +62,6 @@ class gameEvents ():
         if e.action:
           e.action()
         del self.eventList [0]
-
     return True # Event object is always here
 
   def draw (self, e):
@@ -67,7 +70,6 @@ class gameEvents ():
       if ev.msg:
         e.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = ev.msg)
 
-
 # if you're facing dir and want to go goalDir, return the delta. -PI to PI
 def angleTo (dir, goalDir):
   dif = goalDir - dir
@@ -75,9 +77,7 @@ def angleTo (dir, goalDir):
     dif -= TAU
   elif dif < -PI:
     dif += TAU
-
   return dif
-
 
 def angleNorm (dir):
   if dir > PI:
