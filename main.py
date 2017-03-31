@@ -7,10 +7,10 @@ from Ship import *
 
 sList = [
     [ 1000, 5000, -1, 2000, newBlackHole ],
-    [ 1000, 2000, -1, 1200, newTanker ],
+    [ 1200, 2000, -1, 1200, newTanker ],
     [ 150,  220,   0, 0,    newAsteroid ],
-    [ 200,  350,   0, 500,  newBigAlien ],
-    [ 300,  500,   0, 1000, newSmallAlien ]
+    [ 200,  300,   0, 500,  newBigAlien ],
+    [ 200,  300,   0, 1000, newSmallAlien ]
   ]
 
 class displayEngine ():
@@ -39,7 +39,7 @@ class displayEngine ():
     # cleanup
     sList [2][2] = wave * 15
     sList [3][2] = wave * 10
-    sList [4][2] = wave * 5
+    sList [4][2] = wave * 7
     self.spawn = spawnList (sList)
 
   def gameOver (self):

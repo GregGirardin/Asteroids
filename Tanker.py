@@ -28,9 +28,9 @@ class Tanker (WorldObject, Pilot):
     self.shape = Shape (s)
 
     # resources available if ship contacts
-    self.fuel = random.uniform (50.0, 80.0)
+    self.fuel = random.uniform (30.0, 70.0)
     self.rounds = random.uniform (30.0, 70.0)
-    self.torpedos = random.uniform (30.0, 70.0)
+    self.torpedos = random.uniform (20.0, 50.0)
 
     self.refuelComplete = False
     self.transferComplete = 0
@@ -81,9 +81,7 @@ class Tanker (WorldObject, Pilot):
     if (self.transferComplete & TX_RESOURCE_ALL == TX_RESOURCE_ALL) and self.refuelComplete is False:
       self.refuelComplete = True
       e.events.newEvent ("Refuel Complete", EVENT_DISPLAY_COUNT / 2, None)
-      hList = [
-        Heuristic ("Depart", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.1, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
-      ]
+      hList = [ Heuristic ("Depart", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.1, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR)) ]
       self.setHlist (hList)
 
     while self.colList:
