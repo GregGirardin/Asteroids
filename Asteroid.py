@@ -46,21 +46,20 @@ class Asteroid (WorldObject):
     self.iron = iron
 
   def update (self, e):
-
     if self.offScreen():
       return False
 
     while self.colList:
       c = self.colList.pop(0)
 
-      if self.iron is True or (c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False):
+      if (self.iron is True or (c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False)) and c.o.type != OBJECT_TYPE_BH:
         # Newtonian billiard ball
         self.v.add (c.i, mod = True)
         self.p.move (Vector (c.d / 2, c.i.direction))
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
       else:
-        for _ in  range (1, random.randrange (10, 20)):
+        for _ in range (1, random.randrange (10, 20)):
           p = SmokeParticle (Point (self.p.x, self.p.y),
                              Vector (2 * random.random(), random.uniform (0, TAU)),
                              random.randrange (10, 20),
@@ -87,3 +86,41 @@ class Asteroid (WorldObject):
   def draw (self, canvas, p, a):
     width = 3 if self.iron is True else 1
     self.shape.draw (canvas, p, a, width = width)
+
+class BlackHole (WorldObject):
+  def __init__(self):
+    self.radius = random.uniform (20, 50)
+    self.collision = OBJECT_TYPE_NONE
+
+    WorldObject.__init__ (self,
+                          OBJECT_TYPE_BH,
+                          Point (-5, random.randrange (SCREEN_HEIGHT * .2, SCREEN_HEIGHT * .8)),
+                          0,
+                          Vector (random.uniform (1.4, 3), random.uniform (-.5, .5)),
+                          self.radius,
+                          mass = BH_MASS * self.radius,
+                          weapon=True) # BH's destory everything.
+
+  def update (self, e):
+    if self.offScreen():
+      return False
+
+    WorldObject.update (self, e)
+
+    for obj in e.objects:
+      if obj is not self:
+        dis = obj.p.distanceTo (self.p)
+        dir = obj.p.directionTo (self.p)
+        m = self.mass / (dis ** 2)
+        obj.v.add (Vector (m, dir))
+        if obj.v.magnitude > SPEED_VHI:
+           obj.v.magnitude = SPEED_VHI
+
+    return True
+
+  def draw (self, canvas, p, a):
+    canvas.create_oval (p.x - self.radius,
+                        p.y - self.radius,
+                        p.x + self.radius,
+                        p.y + self.radius,
+                        fill = "black")

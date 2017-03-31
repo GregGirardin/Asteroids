@@ -3,16 +3,16 @@ An Asteroids style game.
 Objective
 
   Shoot as many aliens and asteroids in the three waves.
-  Iron asteroids can't be destroyed, but you can adjust their velocity with the cannon.
+
   A refueling tanker will appear occasionally to replenish resources. Just fly next to it and it will pull you in.
-  Slow contact of objects doesn't result in destruction.
+  Iron asteroids can only be destroyed by Black Holes, but you can adjust their velocity with the cannon.
 
 Scoring
 
-  Asteroids                     10
+  Asteroids                     20
   Big aliens                   100
   Small Attacking aliens       250
-  Completing a wave            500 * wave
+  Completing a wave            1000 * wave
 
   Cannon                        -1
   Torpedos                     -10
@@ -25,7 +25,6 @@ Keys
   right = turn right
   space = fire cannon
   z or t = fire torpedo
-
 
 If you have any suggestions let me know.
 

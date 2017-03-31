@@ -2,8 +2,46 @@ from Constants import *
 from Shape import *
 import math
 
-# 0 is right, PI/2 is up, PI is left, -PI/2 is down
+class Point():
+  def __init__ (self, x, y):
+    self.x = x
+    self.y = y
 
+  def distanceTo (self, p): # p is another Point
+     return math.sqrt ((self.x - p.x) ** 2 + (self.y - p.y) ** 2)
+
+  def directionTo (self, p): # p is another point
+    cx = p.x - self.x
+    cy = p.y - self.y
+
+    magnitude = math.sqrt (cx ** 2 + cy ** 2)
+
+    if magnitude < EFFECTIVE_ZERO:
+      direction = 0
+    else:
+      if math.fabs (cx) < EFFECTIVE_ZERO:
+        if cy > 0:
+          direction = -PI / 2
+        else:
+          direction = PI / 2
+      elif cx > 0:
+        direction = math.atan (-cy / cx)
+      else:
+        direction = PI + math.atan (-cy / cx)
+
+    return direction
+
+  def move (self, v): # v is a Vector PI/2 is up (-y)
+    self.x += v.magnitude * math.cos (v.direction)
+    self.y -= v.magnitude * math.sin (v.direction)
+    return self
+
+  def translate (self, p, theta): # p is location, theta is orientation.
+    xr = self.x * math.cos (theta) - self.y * math.sin (theta) + p.x
+    yr = -self.y * math.cos (theta) - self.x * math.sin (theta) + p.y
+    return Point (xr, yr)
+
+# 0 is right, PI/2 is up, PI is left, -PI/2 is down
 class Vector ():
   def __init__ (self, m, d):
     self.magnitude = m

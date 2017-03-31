@@ -142,7 +142,7 @@ class HeuristicAttack ():
     self.duration = duration
     self.durationCounter = duration
     self.attackState = ATTACK_INIT
-    self.aangleOffset = random.uniform (-.2, .2) # shoot a bit randomly
+    self.aangleOffset = 0
     self.ttNextAttack = 1
 
   def update (self, s, e):

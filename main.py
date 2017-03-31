@@ -30,6 +30,7 @@ class displayEngine ():
     self.nextTanker = random.uniform (500, 2000)
     self.nextAlien = random.uniform (200, 300)
     self.nextAsteroid = random.uniform (10, 100)
+    self.nextBH = random.uniform (1000, 3000)
 
   def gameOver (self):
     if self.score > self.highScore:
@@ -64,6 +65,11 @@ class displayEngine ():
         self.objects.remove (o)
 
     # spawn stuff
+    self.nextBH -= 1
+    if self.nextBH < 0:
+      e.addObj (BlackHole ())
+      self.nextBH = random.uniform (2000, 5000)
+
     self.nextTanker -= 1
     if self.nextTanker < 0:
       e.addObj (Tanker())
