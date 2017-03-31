@@ -9,8 +9,8 @@ sList = [
     [ 1000, 5000, -1, 2000, newBlackHole ],
     [ 1000, 2000, -1, 1200, newTanker ],
     [ 150,  220,   0, 0,    newAsteroid ],
-    [ 200,  450,   0, 500,  newBigAlien ],
-    [ 300,  700,   0, 1000, newSmallAlien ]
+    [ 200,  350,   0, 500,  newBigAlien ],
+    [ 300,  500,   0, 1000, newSmallAlien ]
   ]
 
 class displayEngine ():
@@ -21,6 +21,7 @@ class displayEngine ():
     self.highScore = 0
     self.eventDisplayCount = 0
     self.events = gameEvents()
+    self.gameOn = None
     self.newGame()
     self.spawn = spawnList (sList)
 
@@ -29,13 +30,14 @@ class displayEngine ():
     self.numShips = NUM_SHIPS
     self.score = 0
     self.respawn = True
+    self.gameOn = True
     self.newWave (1)
 
   def newWave (self, wave):
     self.wave = wave
     self.waveComplete = False
     # cleanup
-    sList [2][2] = wave * 12
+    sList [2][2] = wave * 15
     sList [3][2] = wave * 10
     sList [4][2] = wave * 5
     self.spawn = spawnList (sList)
@@ -53,7 +55,7 @@ class displayEngine ():
         if i != j:
           obj1 = self.objects [i]
           obj2 = self.objects [j]
-          if 1: # if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
+          if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
             colDist = obj1.colRadius + obj2.colRadius
             actDist = obj1.p.distanceTo (obj2.p)
             if actDist < colDist:
@@ -72,22 +74,24 @@ class displayEngine ():
         self.objects.remove (o)
 
     # spawn
-    if self.spawn.update (e) == True:
-      checkComplete = True
-      for obj in self.objects:
-        if obj.type == OBJECT_TYPE_ALIEN or obj.type == OBJECT_TYPE_ASTEROID:
-          checkComplete = False
-          break
-      if checkComplete == True:
-        self.waveComplete = True
-        self.score += WAVE_COMP_POINTS * self.wave
-        if self.wave == NUM_WAVES:
-          self.events.newEvent ("Congration. Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
-        else:
-          self.events.newEvent ("Wave complete bonus.", EVENT_DISPLAY_COUNT / 2, None)
-          self.wave += 1
-          t = "Wave %d" % self.wave
-          self.events.newEvent (t, EVENT_DISPLAY_COUNT, self.newWave (self.wave))
+    if self.gameOn:
+      if self.spawn.update (e) == True:
+        checkComplete = True
+        for obj in self.objects:
+          if obj.type == OBJECT_TYPE_ALIEN or obj.type == OBJECT_TYPE_ASTEROID:
+            checkComplete = False
+            break
+        if checkComplete == True:
+          self.waveComplete = True
+          self.score += WAVE_COMP_POINTS * self.wave
+          if self.wave == NUM_WAVES:
+            self.events.newEvent ("Congration. Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
+            self.gameOn = False
+          else:
+            self.events.newEvent ("Wave complete bonus.", EVENT_DISPLAY_COUNT / 2, None)
+            self.wave += 1
+            t = "Wave %d" % self.wave
+            self.events.newEvent (t, EVENT_DISPLAY_COUNT, self.newWave (self.wave))
 
     # events
     self.events.update()

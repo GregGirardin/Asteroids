@@ -12,7 +12,7 @@ Scoring
   Asteroids                     20
   Big aliens                   100
   Small Attacking aliens       250
-  Completing a wave            1000 * wave
+  Completing a wave            500 * wave
 
   Cannon                        -1
   Torpedos                     -10
