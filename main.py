@@ -5,6 +5,14 @@ from Aliens import *
 from Asteroid import *
 from Ship import *
 
+sList = [
+    [ 1000, 5000, -1, 2000, newBlackHole ],
+    [ 1000, 2000, -1, 1200, newTanker ],
+    [ 150,  220,   0, 0,    newAsteroid ],
+    [ 200,  450,   0, 500,  newBigAlien ],
+    [ 300,  700,   0, 1000, newSmallAlien ]
+  ]
+
 class displayEngine ():
   def __init__ (self):
     self.root = Tk()
@@ -14,6 +22,7 @@ class displayEngine ():
     self.eventDisplayCount = 0
     self.events = gameEvents()
     self.newGame()
+    self.spawn = spawnList (sList)
 
   def newGame (self):
     self.objects = []
@@ -23,14 +32,13 @@ class displayEngine ():
     self.newWave (1)
 
   def newWave (self, wave):
-    self.remainingAsteroids = 10 * wave
-    self.remainingAliens = 10 * wave
     self.wave = wave
     self.waveComplete = False
-    self.nextTanker = random.uniform (500, 2000)
-    self.nextAlien = random.uniform (200, 300)
-    self.nextAsteroid = random.uniform (10, 100)
-    self.nextBH = random.uniform (1000, 3000)
+    # cleanup
+    sList [2][2] = wave * 12
+    sList [3][2] = wave * 10
+    sList [4][2] = wave * 5
+    self.spawn = spawnList (sList)
 
   def gameOver (self):
     if self.score > self.highScore:
@@ -39,21 +47,20 @@ class displayEngine ():
     s = None
 
   def update (self):
-    # collision detection (fix wasteful checks)
+    # collision detection
     for i in range (0, len (self.objects) - 1):
       for j in range (i + 1, len (self.objects)):
         if i != j:
           obj1 = self.objects [i]
           obj2 = self.objects [j]
-          if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
+          if 1: # if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
             colDist = obj1.colRadius + obj2.colRadius
             actDist = obj1.p.distanceTo (obj2.p)
             if actDist < colDist:
               adjJust = colDist - actDist
               dir = obj2.p.directionTo (obj1.p)
               spd = obj2.v.dot (dir) + obj1.v.dot (dir + PI) # velocity towards each other.
-              if spd > 0:
-                # make sure they're moving toward each other
+              if spd > 0:  # make sure they're moving toward each other
                 c = CollisionObject (obj2, Vector (spd * obj2.mass / obj1.mass, dir), adjJust)
                 obj1.colList.append (c)
                 c = CollisionObject (obj1, Vector (spd * obj1.mass / obj2.mass, dir - PI), adjJust)
@@ -64,37 +71,8 @@ class displayEngine ():
       if o.update (self) == False:
         self.objects.remove (o)
 
-    # spawn stuff
-    self.nextBH -= 1
-    if self.nextBH < 0:
-      e.addObj (BlackHole ())
-      self.nextBH = random.uniform (2000, 5000)
-
-    self.nextTanker -= 1
-    if self.nextTanker < 0:
-      e.addObj (Tanker())
-      self.nextTanker = random.uniform (1000, 2000)
-
-    if self.remainingAsteroids > 0:
-      self.nextAsteroid -= 1
-      if self.nextAsteroid < 0:
-        self.remainingAsteroids -= 1
-        self.nextAsteroid = random.uniform (120, 220)
-        e.addObj (Asteroid (random.uniform (10, 50), iron = True if random.random() < .2 else False))
-
-    if self.remainingAliens > 0:
-      self.nextAlien -= 1
-      if self.nextAlien < 0:
-        self.remainingAliens -= 1
-        self.nextAlien = random.uniform (130, 250)
-        if random.random() < .2 + .15 * self.wave: # more of these with each level
-          a = SmallAlien()
-        else:
-          a = BigAlien()
-        e.addObj (a)
-
-    # check if wave complete
-    if self.remainingAsteroids == 0 and self.remainingAliens == 0 and self.waveComplete == False:
+    # spawn
+    if self.spawn.update (e) == True:
       checkComplete = True
       for obj in self.objects:
         if obj.type == OBJECT_TYPE_ALIEN or obj.type == OBJECT_TYPE_ASTEROID:
@@ -102,12 +80,11 @@ class displayEngine ():
           break
       if checkComplete == True:
         self.waveComplete = True
+        self.score += WAVE_COMP_POINTS * self.wave
         if self.wave == NUM_WAVES:
           self.events.newEvent ("Congration. Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
         else:
-          self.score += WAVE_COMP_POINTS * self.wave
           self.events.newEvent ("Wave complete bonus.", EVENT_DISPLAY_COUNT / 2, None)
-
           self.wave += 1
           t = "Wave %d" % self.wave
           self.events.newEvent (t, EVENT_DISPLAY_COUNT, self.newWave (self.wave))

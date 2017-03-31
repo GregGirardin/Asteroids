@@ -17,7 +17,6 @@ class SmokeParticle (WorldObject):
 
   def update (self, e):
     WorldObject.update (self, e)
-
     if self.ttl > 0:
       self.ttl -= 1
       return True
@@ -34,7 +33,6 @@ class CanonParticle (WorldObject):
 
   def update (self, e):
     WorldObject.update (self, e)
-
     if self.ttl > 0:
       self.ttl -= 1
     if self.ttl <= 0:
@@ -59,11 +57,12 @@ class Torpedo (WorldObject):
 
   def update (self, e):
     WorldObject.update (self, e)
-
     self.age += 1
     if self.age > 20:
-      p = CanonParticle (Point (self.p.x, self.p.y),  Vector (1 + 2 * random.random(), TAU * random.random ()).add (self.v),
-                         random.uniform (20, 30), type = OBJECT_TYPE_T_CANNON)
+      p = CanonParticle (Point (self.p.x, self.p.y),
+                         Vector (1 + 2 * random.random(), TAU * random.random ()).add (self.v),
+                         random.uniform (20, 30),
+                         type = OBJECT_TYPE_T_CANNON)
       e.addObj (p)
 
     if self.ttl < 0:
@@ -71,7 +70,7 @@ class Torpedo (WorldObject):
 
     self.ttl -= 1
     while self.colList:
-      c = self.colList.pop(0) # just process one
+      c = self.colList.pop(0)
 
       if c.o.type == OBJECT_TYPE_ASTEROID and c.o.iron == True:
         self.v.add (c.i, mod = True)

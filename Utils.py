@@ -70,6 +70,41 @@ class gameEvents ():
       if ev.msg:
         e.canvas.create_text (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = ev.msg)
 
+class spawnAble ():
+  def __init__(self, min, max, num, ict, newFunc):
+    self.min = min
+    self.max = max
+    self.num = num
+    self.newFunc = newFunc
+    self.spawnCountdown = ict
+
+  def update (self, e):
+    if self.num > 0 or self.num == -1:
+      self.spawnCountdown -= 1
+      if self.spawnCountdown <= 0:
+        self.spawnCountdown = random.randrange (self.min, self.max)
+        s = self.newFunc()
+        e.addObj (s)
+        if self.num > 0:
+          self.num -= 1
+
+class spawnList ():
+  def __init__ (self, l):
+    self.spawnAbles = []
+    for s in l:
+      self.spawnAbles.append (spawnAble (*s))
+
+  def update (self, e):
+    if self.spawnAbles:
+      for s in self.spawnAbles:
+        s.update (e)
+    done = True
+    for s in self.spawnAbles:
+      if s.num > 0:
+        done = False
+        break
+    return done
+
 # if you're facing dir and want to go goalDir, return the delta. -PI to PI
 def angleTo (dir, goalDir):
   dif = goalDir - dir

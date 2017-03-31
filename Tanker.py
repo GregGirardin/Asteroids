@@ -28,9 +28,9 @@ class Tanker (WorldObject, Pilot):
     self.shape = Shape (s)
 
     # resources available if ship contacts
-    self.fuel = random.uniform (50.0, 100.0)
-    self.rounds = random.uniform (50.0, 100.0)
-    self.torpedos = random.uniform (50.0, 100.0)
+    self.fuel = random.uniform (50.0, 80.0)
+    self.rounds = random.uniform (30.0, 70.0)
+    self.torpedos = random.uniform (30.0, 70.0)
 
     self.refuelComplete = False
     self.transferComplete = 0
@@ -42,11 +42,11 @@ class Tanker (WorldObject, Pilot):
       Heuristic ("s",  "w",  HeuristicStop ()),
       Heuristic ("w",  "f2", HeuristicWait (500)),
       Heuristic ("f2", "d",  HeuristicFace (0)),
-      Heuristic ("d",  None, HeuristicGo (SPEED_HI, 1000) )
+      Heuristic ("d",  None, HeuristicGo (SPEED_HI, 1000))
       ]
 
     Pilot.__init__ (self, hList)
-    WorldObject.__init__ (self, OBJECT_TYPE_TANKER, p, 0, None, 12)
+    WorldObject.__init__ (self, OBJECT_TYPE_TANKER, p, 0, None, 12, mass = TANKER_MASS)
 
   def update (self, e):
     Pilot.pilot (self, e)
@@ -90,23 +90,29 @@ class Tanker (WorldObject, Pilot):
       c = self.colList.pop(0)
       t = c.o.type
       if t != OBJECT_TYPE_SHIP:
-        for _ in range (1, int (random.uniform (20, 30))):
-          p = SmokeParticle (Point (self.p.x, self.p.y),
-                             Vector (random.random(), random.uniform (0, TAU)).add (self.v),
-                             random.uniform (30, 50),
-                             random.uniform (3, 3.5))
-          e.addObj (p)
+        if c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False:
+          self.v.add (c.i, mod = True)
+          if self.v.magnitude > SPEED_HI:
+            self.v.magnitude = SPEED_HI
+          # self.p.move (Vector (c.d / 2, c.i.direction))
+        elif c.o.type != OBJECT_TYPE_NONE:
+          for _ in range (1, int (random.uniform (20, 30))):
+            p = SmokeParticle (Point (self.p.x, self.p.y),
+                               Vector (random.random(), random.uniform (0, TAU)).add (self.v),
+                               random.uniform (30, 50),
+                               random.uniform (3, 3.5))
+            e.addObj (p)
 
-        if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
-          e.events.newEvent ("You destroyed the SS Vinoski! LOL", EVENT_DISPLAY_COUNT, None)
-        else:
-          e.events.newEvent ("Tanker destroyed", EVENT_DISPLAY_COUNT / 2, None)
+          if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
+            e.events.newEvent ("You destroyed the SS Vinoski! LOL", EVENT_DISPLAY_COUNT, None)
+          else:
+            e.events.newEvent ("Tanker destroyed", EVENT_DISPLAY_COUNT / 2, None)
 
-        if e.score > TANKER_DESTROYED_COST:
-          e.score -= TANKER_DESTROYED_COST
-        else:
-          e.score = 0
-        return False
+          if e.score > TANKER_DESTROYED_COST:
+            e.score -= TANKER_DESTROYED_COST
+          else:
+            e.score = 0
+          return False
 
     return True
 
@@ -116,3 +122,6 @@ class Tanker (WorldObject, Pilot):
       canvas.create_line (p.x, p.y,
                           self.tPoint.x + random.uniform (-2, 2),
                           self.tPoint.y + random.uniform (-2, 2), fill = "green")
+
+def newTanker ():
+  return Tanker()

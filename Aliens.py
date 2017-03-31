@@ -16,38 +16,33 @@ class SmallAlien (WorldObject, Pilot):
     self.shape = Shape (s)
     self.cannon = 0
 
-    swl = SCREEN_WIDTH * .2
-    swh = SCREEN_WIDTH * .8
-    shl = SCREEN_HEIGHT * .2
-    shh = SCREEN_HEIGHT * .8
-
     hLists = [
-        [ # randomly flys among a few points, stopping to shoot.
-          Heuristic ("1", "1a", HeuristicGotoRandom()),
-          Heuristic ("1a", "2", HeuristicAttack (100)),
-          Heuristic ("2", "2a", HeuristicGotoRandom()),
-          Heuristic ("2a", "3", HeuristicAttack (random.uniform (100, 300))),
-          Heuristic ("3", "3a", HeuristicGotoRandom()),
-          Heuristic ("3a", "1", HeuristicAttack (100)),
-        ],
-        [ # this one flys around clockwise forever and shoots at you
-          Heuristic ("1", "1a", HeuristicGoto (Point (swl, shl), OBJECT_DIST_MED)),
-          Heuristic ("1a", "2", HeuristicAttack (100)),
-          Heuristic ("2", "2a", HeuristicGoto (Point (swh, shl), OBJECT_DIST_MED)),
-          Heuristic ("2a", "3", HeuristicAttack (100)),
-          Heuristic ("3", "3a", HeuristicGoto (Point (swh, shh), OBJECT_DIST_MED)),
-          Heuristic ("3a", "4", HeuristicAttack (100)),
-          Heuristic ("4", "4a", HeuristicGoto (Point (swl, shh), OBJECT_DIST_MED)),
-          Heuristic ("4a", "1", HeuristicAttack (100)),
-        ],
-        [ # This one flys across this screen but shoots at you at a couple points.
-          Heuristic ("1", "2", HeuristicGoto (Point (swl, random.uniform (shl, shh)), OBJECT_DIST_MED)),
-          Heuristic ("2", "2a", HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (shl, shh)), OBJECT_DIST_MED)),
-          Heuristic ("2a", "3", HeuristicAttack (300)),
-          Heuristic ("3", "3a", HeuristicGoto (Point (swh, random.uniform (shl, shh)), OBJECT_DIST_MED)),
-          Heuristic ("3a", "4", HeuristicAttack (300)),
-          Heuristic ("4", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (0, SCREEN_HEIGHT)), OBJECT_DIST_FAR))
-          ]
+      [ # randomly flys among a few points, stopping to shoot.
+        Heuristic ("1", "1a", HeuristicGotoRandom()),
+        Heuristic ("1a", "2", HeuristicAttack (100)),
+        Heuristic ("2", "2a", HeuristicGotoRandom()),
+        Heuristic ("2a", "3", HeuristicAttack (random.uniform (100, 300))),
+        Heuristic ("3", "3a", HeuristicGotoRandom()),
+        Heuristic ("3a", "1", HeuristicAttack (100)),
+      ],
+      [ # this one flys around forever and shoots at you
+        Heuristic ("1", "1a", HeuristicGoto (Point (swh, shl), OBJECT_DIST_MED)),
+        Heuristic ("1a", "2", HeuristicAttack (100)),
+        Heuristic ("2", "2a", HeuristicGoto (Point (swl, shl), OBJECT_DIST_MED)),
+        Heuristic ("2a", "3", HeuristicAttack (100)),
+        Heuristic ("3", "3a", HeuristicGoto (Point (swh, shh), OBJECT_DIST_MED)),
+        Heuristic ("3a", "4", HeuristicAttack (100)),
+        Heuristic ("4", "4a", HeuristicGoto (Point (swl, shh), OBJECT_DIST_MED)),
+        Heuristic ("4a", "1", HeuristicAttack (100)),
+      ],
+      [ # This one flys across this screen but shoots at you at a couple points.
+        Heuristic ("1",  "2", HeuristicGoto (Point (swl, random.uniform (shl, shh)), OBJECT_DIST_MED)),
+        Heuristic ("2", "2a", HeuristicGoto (Point (SCREEN_WIDTH * .5, random.uniform (shl, shh)), OBJECT_DIST_MED)),
+        Heuristic ("2a", "3", HeuristicAttack (300)),
+        Heuristic ("3", "3a", HeuristicGoto (Point (swh, random.uniform (shl, shh)), OBJECT_DIST_MED)),
+        Heuristic ("3a", "4", HeuristicAttack (300)),
+        Heuristic ("4", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.5, random.uniform (0, SCREEN_HEIGHT)), OBJECT_DIST_FAR))
+      ]
     ]
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
     Pilot.__init__ (self, hLists [random.randint(0, 2)])
@@ -68,12 +63,12 @@ class SmallAlien (WorldObject, Pilot):
       e.addObj (p)
 
     while self.colList:
-      c = self.colList.pop(0) # just process one
+      c = self.colList.pop(0)
       if c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False:
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
         self.p.move (Vector (c.d / 2, c.i.direction))
-      else:
+      elif c.o.type != OBJECT_TYPE_NONE:
         for _ in  range (1, random.randrange (10, 20)):
           p = SmokeParticle (Point (self.p.x, self.p.y),
                              Vector (random.random(), TAU * random.random ()).add (self.v),
@@ -112,10 +107,7 @@ class BigAlien (WorldObject, Pilot):
 
     self.shape = Shape (s)
 
-    shl = SCREEN_HEIGHT * .25
-    shh = SCREEN_HEIGHT * .75
-
-    hLists = [
+    hLists =[
       [
         Heuristic ("i", "x", HeuristicGoto (Point (SCREEN_WIDTH * random.uniform (.3, .7), random.uniform (shl, shh)), OBJECT_DIST_NEAR)),
         Heuristic ("x", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.1, random.uniform (-200, SCREEN_HEIGHT + 200)), OBJECT_DIST_MED))
@@ -129,7 +121,8 @@ class BigAlien (WorldObject, Pilot):
         Heuristic ("f", "g", HeuristicFace (random.uniform (-.4, .4))), # face right ish
         Heuristic ("g", "d", HeuristicGo (SPEED_HI, random.uniform (200, 700))),
         Heuristic ("d", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.2, SCREEN_HEIGHT * random.random()), OBJECT_DIST_NEAR))
-      ]]
+      ]
+    ]
 
     p = Point (-SCREEN_BUFFER + 1, SCREEN_HEIGHT * random.random())
 
@@ -144,12 +137,12 @@ class BigAlien (WorldObject, Pilot):
       return False
 
     while self.colList:
-      c = self.colList.pop(0) # just process one
+      c = self.colList.pop(0)
       if c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False:
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
         self.p.move (Vector (c.d / 2, c.i.direction))
-      else:
+      elif c.o.type != OBJECT_TYPE_NONE:
         for _ in  range (1, random.randrange (30, 40)):
           p = SmokeParticle (Point (self.p.x, self.p.y),
                              Vector (random.random(), TAU * random.random ()).add (self.v),
@@ -179,3 +172,8 @@ class BigAlien (WorldObject, Pilot):
       canvas.create_line (p.x, p.y, p.x + self.tv.dx() * 20, p.y + self.tv.dy() * 20, arrow = tk.LAST)
       canvas.create_line (p.x, p.y, p.x + self.cv.dx() * 20, p.y + self.cv.dy() * 20, arrow = tk.LAST, fill = "red")
       canvas.create_oval (self.target.x - 2, self.target.y - 2, self.target.x + 2, self.target.y + 2)
+
+def newSmallAlien ():
+  return SmallAlien()
+def newBigAlien():
+  return BigAlien()

@@ -52,10 +52,13 @@ class Asteroid (WorldObject):
     while self.colList:
       c = self.colList.pop(0)
 
+      if c.o.type == OBJECT_TYPE_NONE:
+        continue
+
       if (self.iron is True or (c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False)) and c.o.type != OBJECT_TYPE_BH:
         # Newtonian billiard ball
         self.v.add (c.i, mod = True)
-        self.p.move (Vector (c.d / 2, c.i.direction))
+        # self.p.move (Vector (c.d / 2, c.i.direction))
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
       else:
@@ -68,10 +71,11 @@ class Asteroid (WorldObject):
 
         if self.colRadius > MIN_ASTEROID_RADIUS * 2:
           vector = random.uniform (0, TAU)
+          r = self.colRadius / 2
           for v in (0, PI):
-            a = Asteroid (self.colRadius / 2)
-            a.p.x = self.p.x + self.colRadius * math.cos (vector + v)
-            a.p.y = self.p.y + self.colRadius * math.sin (vector + v)
+            a = Asteroid (r)
+            a.p.x = self.p.x + r * math.cos (vector + v)
+            a.p.y = self.p.y + r * math.sin (vector + v)
             a.velocity = Vector (self.v.magnitude * 1.5, self.v.direction + v)
             e.addObj (a)
 
@@ -86,6 +90,9 @@ class Asteroid (WorldObject):
   def draw (self, canvas, p, a):
     width = 3 if self.iron is True else 1
     self.shape.draw (canvas, p, a, width = width)
+
+def newAsteroid ():
+  return Asteroid (random.uniform (10, 50), iron = True if random.random() < .2 else False)
 
 class BlackHole (WorldObject):
   def __init__(self):
@@ -124,3 +131,6 @@ class BlackHole (WorldObject):
                         p.x + self.radius,
                         p.y + self.radius,
                         fill = "black")
+
+def newBlackHole():
+  return BlackHole()

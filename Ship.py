@@ -106,7 +106,7 @@ class Ship (WorldObject):
         self.v.add (c.i, mod = True)
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
-        self.p.move (Vector (c.d / 2, c.i.direction))
+        # self.p.move (Vector (c.d / 2, c.i.direction))
       else:
         e.numShips -= 1
         if e.numShips < 0:
