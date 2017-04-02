@@ -118,7 +118,7 @@ class HeuristicGoto ():
     return False
 
 def HeuristicGotoRandom():
-  return (HeuristicGoto (Point (SCREEN_WIDTH  * random.random (), SCREEN_HEIGHT * random.random ()), OBJECT_DIST_MED))
+  return HeuristicGoto (Point (SCREEN_WIDTH  * random.random (), SCREEN_HEIGHT * random.random ()), OBJECT_DIST_MED)
 
 class HeuristicWait ():
   def __init__ (self, duration):

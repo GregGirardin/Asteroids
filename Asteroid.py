@@ -1,6 +1,3 @@
-from Constants import *
-from Shape import *
-from Vector import *
 from Particles import *
 from Utils import *
 
@@ -58,15 +55,12 @@ class Asteroid (WorldObject):
       if (self.iron is True or (c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False)) and c.o.type != OBJECT_TYPE_BH:
         # Newtonian billiard ball
         self.v.add (c.i, mod = True)
-        # self.p.move (Vector (c.d / 2, c.i.direction))
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
       else:
         for _ in range (1, random.randrange (10, 20)):
-          p = SmokeParticle (Point (self.p.x, self.p.y),
-                             Vector (2 * random.random(), random.uniform (0, TAU)),
-                             random.randrange (10, 20),
-                             random.uniform (3, 4))
+          p = SmokeParticle (Point (self.p.x, self.p.y), Vector (2 * random.random (), random.uniform (0, TAU)),
+                             random.randrange (10, 20), random.uniform (3, 4))
           e.addObj (p)
 
         if self.colRadius > MIN_ASTEROID_RADIUS * 2:
@@ -99,14 +93,10 @@ class BlackHole (WorldObject):
     self.radius = random.uniform (20, 50)
     self.collision = OBJECT_TYPE_NONE
 
-    WorldObject.__init__ (self,
-                          OBJECT_TYPE_BH,
+    WorldObject.__init__ (self, OBJECT_TYPE_BH,
                           Point (-5, random.randrange (SCREEN_HEIGHT * .2, SCREEN_HEIGHT * .8)),
-                          0,
-                          Vector (random.uniform (1.4, 3), random.uniform (-.5, .5)),
-                          self.radius,
-                          mass = BH_MASS * self.radius,
-                          weapon=True) # BH's destory everything.
+                          0, Vector (random.uniform (1.4, 3), random.uniform (-.5, .5)),
+                          self.radius, mass = BH_MASS * self.radius, weapon = True)  # BH's destory everything.
 
   def update (self, e):
     if self.offScreen():
@@ -126,11 +116,7 @@ class BlackHole (WorldObject):
     return True
 
   def draw (self, canvas, p, a):
-    canvas.create_oval (p.x - self.radius,
-                        p.y - self.radius,
-                        p.x + self.radius,
-                        p.y + self.radius,
-                        fill = "black")
+    canvas.create_oval (p.x - self.radius, p.y - self.radius, p.x + self.radius, p.y + self.radius, fill = "black")
 
 def newBlackHole():
   return BlackHole()

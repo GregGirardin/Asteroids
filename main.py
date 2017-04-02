@@ -20,7 +20,6 @@ class displayEngine ():
     self.canvas = Canvas (self.root, width = SCREEN_WIDTH, height = SCREEN_HEIGHT)
     self.canvas.pack()
     self.highScore = 0
-    self.eventDisplayCount = 0
     self.events = gameEvents()
     self.gameOn = None
     self.newGame()
@@ -53,21 +52,20 @@ class displayEngine ():
     # collision detection
     for i in range (0, len (self.objects) - 1):
       for j in range (i + 1, len (self.objects)):
-        if i != j:
-          obj1 = self.objects [i]
-          obj2 = self.objects [j]
-          if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
-            colDist = obj1.colRadius + obj2.colRadius
-            actDist = obj1.p.distanceTo (obj2.p)
-            if actDist < colDist:
-              adjJust = colDist - actDist
-              dir = obj2.p.directionTo (obj1.p)
-              spd = obj2.v.dot (dir) + obj1.v.dot (dir + PI) # velocity towards each other.
-              if spd > 0:  # make sure they're moving toward each other
-                c = CollisionObject (obj2, Vector (spd * obj2.mass / obj1.mass, dir), adjJust)
-                obj1.colList.append (c)
-                c = CollisionObject (obj1, Vector (spd * obj1.mass / obj2.mass, dir - PI), adjJust)
-                obj2.colList.append (c)
+        obj1 = self.objects [i]
+        obj2 = self.objects [j]
+        if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
+          colDist = obj1.colRadius + obj2.colRadius
+          actDist = obj1.p.distanceTo (obj2.p)
+          if actDist < colDist:
+            adjJust = colDist - actDist
+            dir = obj2.p.directionTo (obj1.p)
+            spd = obj2.v.dot (dir) + obj1.v.dot (dir + PI) # velocity towards each other.
+            if spd > 0:  # make sure they're moving toward each other
+              c = CollisionObject (obj2, Vector (spd * obj2.mass / obj1.mass, dir), adjJust)
+              obj1.colList.append (c)
+              c = CollisionObject (obj1, Vector (spd * obj1.mass / obj2.mass, dir - PI), adjJust)
+              obj2.colList.append (c)
 
     # update objects
     for o in self.objects:
@@ -93,7 +91,6 @@ class displayEngine ():
             self.wave += 1
             t = "Wave %d" % self.wave
             self.events.newEvent (t, EVENT_DISPLAY_COUNT, self.newWave (self.wave))
-
     # events
     self.events.update()
 
@@ -121,7 +118,6 @@ class displayEngine ():
     t = "Wave %d" % self.wave
     self.canvas.create_text (350, 10, text = t)
 
-    # events
     self.events.draw (self)
     self.root.update()
 
@@ -178,5 +174,3 @@ while True:
 
   e.update ()
   e.draw ()
-
-# e.root.mainloop()

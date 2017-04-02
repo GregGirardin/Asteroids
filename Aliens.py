@@ -1,5 +1,3 @@
-from Constants import *
-from Shape import *
 from Vector import *
 from Utils import *
 from Particles import *

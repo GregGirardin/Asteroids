@@ -37,7 +37,7 @@ class Point():
     return self
 
   def translate (self, p, theta): # p is location, theta is orientation.
-    xr = self.x * math.cos (theta) - self.y * math.sin (theta) + p.x
+    xr =  self.x * math.cos (theta) - self.y * math.sin (theta) + p.x
     yr = -self.y * math.cos (theta) - self.x * math.sin (theta) + p.y
     return Point (xr, yr)
 
@@ -75,12 +75,10 @@ class Vector ():
     return self.magnitude * math.cos (self.direction)
   def dy (self): # y component of vector
     return -self.magnitude * math.sin (self.direction)
-
   def flipx (self):
     self.direction = dir (-self.dx(), self.dy())
   def flipy (self):
     self.direction = dir (self.dx(), -self.dy())
-
   def dot (self, angle):
     theta = math.fabs (self.direction - angle)
     return self.magnitude * math.cos (theta)
