@@ -8,14 +8,15 @@ from Ship import *
 sList = [
     [ 1000, 5000, -1, 2000, newBlackHole ],
     [ 1200, 2000, -1, 1200, newTanker ],
-    [ 150,  220,   0, 0,    newAsteroid ],
-    [ 200,  300,   0, 500,  newBigAlien ],
-    [ 200,  300,   0, 1000, newSmallAlien ]
+    [  150,  220,  0,    0, newAsteroid ],
+    [  200,  300,  0,  500, newBigAlien ],
+    [  200,  300,  0, 1000, newSmallAlien ]
   ]
 
 class displayEngine ():
   def __init__ (self):
     self.root = Tk()
+    self.root.title ("Asteroids")
     self.canvas = Canvas (self.root, width = SCREEN_WIDTH, height = SCREEN_HEIGHT)
     self.canvas.pack()
     self.highScore = 0

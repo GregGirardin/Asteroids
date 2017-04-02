@@ -97,14 +97,10 @@ class HeuristicGoto ():
     targetVector = Vector (SPEED_HI * 1.5, dirToTarget) # hack. Long vector and drag smooth out ship.
     correctionVec = vectorDiff (s.v, targetVector) # vector to make our velocity approach targetVector
 
-    # If we're pretty close to targetVector, just go straight
-    # Continuous adjustment causes erratic behavior.
-    desiredVec = correctionVec # targetVector if correctionVec.magnitude < targetVector.magnitude / 3 else correctionVec
-
-    da = angleTo (s.a, desiredVec.direction)
+    da = angleTo (s.a, correctionVec.direction)
 
     s.spin = da / 20
-    dp = dot (s.v, desiredVec) # component of velocity in the direction of correctionVec
+    dp = s.v.dot (correctionVec.direction)
     if dp < SPEED_HI:
       s.accel = THRUST_HI
     elif dp < SPEED_MED:

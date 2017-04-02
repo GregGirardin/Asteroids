@@ -104,11 +104,6 @@ def dir (dx, dy):
 
   return direction
 
-def dot (v1, v2):
-  theta = math.fabs (v1.direction - v2.direction)
-  return v1.magnitude * math.cos (theta)
-
-# returns a vector that would connect 'f' to 't'
 def vectorDiff (f, t):
   dx = t.dx() - f.dx()
   dy = t.dy() - f.dy()

@@ -107,7 +107,7 @@ class BigAlien (WorldObject, Pilot):
 
     self.shape = Shape (s)
 
-    hLists =[
+    hLists = [
       [
         Heuristic ("i", "x", HeuristicGoto (Point (SCREEN_WIDTH * random.uniform (.3, .7), random.uniform (shl, shh)), OBJECT_DIST_NEAR)),
         Heuristic ("x", None, HeuristicGoto (Point (SCREEN_WIDTH * 1.1, random.uniform (-200, SCREEN_HEIGHT + 200)), OBJECT_DIST_MED))
@@ -175,5 +175,6 @@ class BigAlien (WorldObject, Pilot):
 
 def newSmallAlien ():
   return SmallAlien()
+
 def newBigAlien():
   return BigAlien()
