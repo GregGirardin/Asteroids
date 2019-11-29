@@ -7,7 +7,7 @@ class Asteroid( WorldObject ):
     r = []
     for _ in range( 0, radii ):
       r.append (radius + random.uniform( 0, 5 ) )
-    r.append (r [0])
+    r.append( r[ 0 ] )
 
     s = []
     theta = 0
@@ -54,20 +54,20 @@ class Asteroid( WorldObject ):
 
       if( self.iron is True or( c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False ) ) and c.o.type != OBJECT_TYPE_BH:
         # Newtonian billiard ball
-        self.v.add (c.i, mod = True)
+        self.v.add( c.i, mod = True )
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
       else:
         for _ in range( 1, random.randrange( 10, 20 ) ):
           p = SmokeParticle( Point( self.p.x, self.p.y ), Vector( 2 * random.random(), random.uniform( 0, TAU ) ),
                              random.randrange( 10, 20 ), random.uniform( 3, 4 ) )
-          e.addObj (p)
+          e.addObj( p )
 
         if self.colRadius > MIN_ASTEROID_RADIUS * 2:
           vector = random.uniform( 0, TAU )
           r = self.colRadius / 2
-          for v in ( 0, PI ):
-            a = Asteroid (r)
+          for v in( 0, PI ):
+            a = Asteroid( r )
             a.p.x = self.p.x + r * math.cos( vector + v )
             a.p.y = self.p.y + r * math.sin( vector + v )
             a.velocity = Vector( self.v.magnitude * 1.5, self.v.direction + v )
@@ -94,8 +94,8 @@ class BlackHole( WorldObject ):
     self.collision = OBJECT_TYPE_NONE
 
     WorldObject.__init__( self, OBJECT_TYPE_BH,
-                          Point( -5, random.randrange (SCREEN_HEIGHT * .2, SCREEN_HEIGHT * .8 ) ),
-                          0, Vector( random.uniform (1.4, 3), random.uniform( -.5, .5 ) ),
+                          Point( -5, random.randrange( SCREEN_HEIGHT * .2, SCREEN_HEIGHT * .8 ) ),
+                          0, Vector( random.uniform( 1.4, 3 ), random.uniform( -.5, .5 ) ),
                           self.radius, mass = BH_MASS * self.radius, weapon = True )  # BH's destory everything.
 
   def update( self, e ):

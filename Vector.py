@@ -56,7 +56,7 @@ class Vector():
     if mod:
       self.magnitude = magnitude
       self.direction = direction
-    return Vector (magnitude, direction)
+    return Vector( magnitude, direction )
 
   # make vector a bit closer to aVec
   def adjust( self, aVec, weight = .1 ):

@@ -5,7 +5,8 @@ from Aliens import *
 from Asteroid import *
 from Ship import *
 
-sList = [
+sList = \
+  [
     [ 1000, 5000, -1, 2000, newBlackHole ],
     [ 1200, 2000, -1, 1200, newTanker ],
     [  150,  220,  0,    0, newAsteroid ],
@@ -13,7 +14,7 @@ sList = [
     [  200,  300,  0, 1000, newSmallAlien ]
   ]
 
-class displayEngine ():
+class displayEngine():
   def __init__( self ):
     self.root = Tk()
     self.root.title( "Asteroids" )
@@ -40,7 +41,7 @@ class displayEngine ():
     sList[ 2 ][ 2 ] = wave * 15
     sList[ 3 ][ 2 ] = wave * 10
     sList[ 4 ][ 2 ] = wave * 7
-    self.spawn = spawnList (sList)
+    self.spawn = spawnList( sList )
 
   def gameOver( self ):
     if self.score > self.highScore:
@@ -50,31 +51,31 @@ class displayEngine ():
 
   def update( self ):
     # collision detection
-    for i in range (0, len (self.objects) - 1):
-      for j in range (i + 1, len (self.objects)):
-        obj1 = self.objects [i]
-        obj2 = self.objects [j]
+    for i in range( 0, len( self.objects) - 1 ):
+      for j in range( i + 1, len( self.objects ) ):
+        obj1 = self.objects[ i ]
+        obj2 = self.objects[ j ]
         if obj1.type != OBJECT_TYPE_NONE and obj2.type != OBJECT_TYPE_NONE:
           colDist = obj1.colRadius + obj2.colRadius
-          actDist = obj1.p.distanceTo (obj2.p)
+          actDist = obj1.p.distanceTo( obj2.p )
           if actDist < colDist:
             adjJust = colDist - actDist
-            dir = obj2.p.directionTo (obj1.p)
-            spd = obj2.v.dot (dir) + obj1.v.dot (dir + PI) # velocity towards each other.
+            dir = obj2.p.directionTo( obj1.p )
+            spd = obj2.v.dot( dir ) + obj1.v.dot( dir + PI ) # velocity towards each other.
             if spd > 0:  # make sure they're moving toward each other
-              c = CollisionObject (obj2, Vector (spd * obj2.mass / obj1.mass, dir), adjJust)
-              obj1.colList.append (c)
-              c = CollisionObject (obj1, Vector (spd * obj1.mass / obj2.mass, dir - PI), adjJust)
-              obj2.colList.append (c)
+              c = CollisionObject( obj2, Vector( spd * obj2.mass / obj1.mass, dir ), adjJust )
+              obj1.colList.append( c )
+              c = CollisionObject( obj1, Vector( spd * obj1.mass / obj2.mass, dir - PI ), adjJust )
+              obj2.colList.append( c )
 
     # update objects
     for o in self.objects:
-      if o.update (self) == False:
-        self.objects.remove (o)
+      if o.update( self ) == False:
+        self.objects.remove( o )
 
     # spawn
     if self.gameOn:
-      if self.spawn.update (e) == True:
+      if self.spawn.update( e ) == True:
         checkComplete = True
         for obj in self.objects:
           if obj.type == OBJECT_TYPE_ALIEN or obj.type == OBJECT_TYPE_ASTEROID:
@@ -84,13 +85,13 @@ class displayEngine ():
           self.waveComplete = True
           self.score += WAVE_COMP_POINTS * self.wave
           if self.wave == NUM_WAVES:
-            self.events.newEvent ("Congration. Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver)
+            self.events.newEvent( "Congration. Your winner", EVENT_DISPLAY_COUNT * 2, self.gameOver )
             self.gameOn = False
           else:
-            self.events.newEvent ("Wave complete bonus.", EVENT_DISPLAY_COUNT / 2, None)
+            self.events.newEvent( "Wave complete bonus.", EVENT_DISPLAY_COUNT / 2, None )
             self.wave += 1
             t = "Wave %d" % self.wave
-            self.events.newEvent (t, EVENT_DISPLAY_COUNT, self.newWave (self.wave))
+            self.events.newEvent( t, EVENT_DISPLAY_COUNT, self.newWave( self.wave ) )
     # events
     self.events.update()
 

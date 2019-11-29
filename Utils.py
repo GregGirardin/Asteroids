@@ -52,7 +52,7 @@ class gameEvents():
 
   def newEvent( self, msg, dur, action ):
     ev = Event( msg, dur, action )
-    self.eventList.append (ev)
+    self.eventList.append( ev )
 
   def update( self ):
     if len (self.eventList) > 0:
