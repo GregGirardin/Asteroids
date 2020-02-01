@@ -2,9 +2,9 @@ from Constants import *
 from Shape import *
 from Vector import *
 
-class WorldObject ():
+class WorldObject():
   # Attributes every object has.
-  def __init__( self, type, p, a=0.0, v=None, colRadius=0, mass=1.0, weapon = False ):
+  def __init__( self, type, p, a = 0.0, v= None, colRadius = 0, mass = 1.0, weapon = False ):
     if not v:
       v = Vector( 0, 0 )
     self.v = v
@@ -55,7 +55,7 @@ class gameEvents():
     self.eventList.append( ev )
 
   def update( self ):
-    if len (self.eventList) > 0:
+    if len( self.eventList ) > 0:
       e = self.eventList[ 0 ]
       e.dur -= 1
       if e.dur < 0:

@@ -19,7 +19,7 @@ class Ship( WorldObject ):
     self.torpedoDelay = 0
     WorldObject.__init__( self,
                           OBJECT_TYPE_SHIP,
-                          Point (SCREEN_WIDTH * .75, SCREEN_HEIGHT / 2),
+                          Point( SCREEN_WIDTH * .75, SCREEN_HEIGHT / 2 ),
                           PI,
                           None,
                           7,

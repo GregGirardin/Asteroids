@@ -73,12 +73,16 @@ class Vector():
 
   def dx( self ): # x component of vector
     return self.magnitude * math.cos( self.direction )
+
   def dy( self ): # y component of vector
     return -self.magnitude * math.sin( self.direction )
+
   def flipx( self ):
     self.direction = dir( -self.dx(), self.dy() )
+
   def flipy( self ):
     self.direction = dir( self.dx(), -self.dy() )
+
   def dot( self, angle ):
     theta = math.fabs( self.direction - angle )
     return self.magnitude * math.cos( theta )

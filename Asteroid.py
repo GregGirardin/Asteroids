@@ -6,7 +6,7 @@ class Asteroid( WorldObject ):
     radii = 6 + random.randrange( 0, 5 )
     r = []
     for _ in range( 0, radii ):
-      r.append (radius + random.uniform( 0, 5 ) )
+      r.append( radius + random.uniform( 0, 5 ) )
     r.append( r[ 0 ] )
 
     s = []
@@ -52,15 +52,17 @@ class Asteroid( WorldObject ):
       if c.o.type == OBJECT_TYPE_NONE:
         continue
 
-      if( self.iron is True or( c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False ) ) and c.o.type != OBJECT_TYPE_BH:
+      if( self.iron is True or ( c.i.magnitude < SMALL_IMPULSE and c.o.weapon is False ) ) and c.o.type != OBJECT_TYPE_BH:
         # Newtonian billiard ball
         self.v.add( c.i, mod = True )
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
       else:
         for _ in range( 1, random.randrange( 10, 20 ) ):
-          p = SmokeParticle( Point( self.p.x, self.p.y ), Vector( 2 * random.random(), random.uniform( 0, TAU ) ),
-                             random.randrange( 10, 20 ), random.uniform( 3, 4 ) )
+          p = SmokeParticle( Point( self.p.x, self.p.y ),
+                             Vector( 2 * random.random(), random.uniform( 0, TAU ) ),
+                             random.randrange( 10, 20 ),
+                             random.uniform( 3, 4 ) )
           e.addObj( p )
 
         if self.colRadius > MIN_ASTEROID_RADIUS * 2:
@@ -86,7 +88,7 @@ class Asteroid( WorldObject ):
     self.shape.draw( canvas, p, a, width = width )
 
 def newAsteroid():
-  return Asteroid( random.uniform (10, 50), iron = True if random.random() < .2 else False )
+  return Asteroid( random.uniform( 10, 50 ), iron = True if random.random() < .2 else False )
 
 class BlackHole( WorldObject ):
   def __init__( self ):
@@ -95,8 +97,11 @@ class BlackHole( WorldObject ):
 
     WorldObject.__init__( self, OBJECT_TYPE_BH,
                           Point( -5, random.randrange( SCREEN_HEIGHT * .2, SCREEN_HEIGHT * .8 ) ),
-                          0, Vector( random.uniform( 1.4, 3 ), random.uniform( -.5, .5 ) ),
-                          self.radius, mass = BH_MASS * self.radius, weapon = True )  # BH's destory everything.
+                          0,
+                          Vector( random.uniform( 1.4, 3 ), random.uniform( -.5, .5 ) ),
+                          self.radius,
+                          mass = BH_MASS * self.radius,
+                          weapon = True ) # BHs destroy everything.
 
   def update( self, e ):
     if self.offScreen():
@@ -116,7 +121,11 @@ class BlackHole( WorldObject ):
     return True
 
   def draw( self, canvas, p, a ):
-    canvas.create_oval( p.x - self.radius, p.y - self.radius, p.x + self.radius, p.y + self.radius, fill = "black" )
+    canvas.create_oval( p.x - self.radius,
+                        p.y - self.radius,
+                        p.x + self.radius,
+                        p.y + self.radius,
+                        fill = "black" )
 
 def newBlackHole():
   return BlackHole()

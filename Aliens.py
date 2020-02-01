@@ -25,7 +25,7 @@ class SmallAlien( WorldObject, Pilot ):
         Heuristic( "3a", "1", HeuristicAttack( 100 ) ),
       ],
       [ # this one flys around forever and shoots at you
-        Heuristic( "1", "1a", HeuristicGoto (Point( swh, shl ), OBJECT_DIST_MED ) ),
+        Heuristic( "1", "1a", HeuristicGoto( Point( swh, shl ), OBJECT_DIST_MED ) ),
         Heuristic( "1a", "2", HeuristicAttack( 100 ) ),
         Heuristic( "2", "2a", HeuristicGoto( Point( swl, shl ), OBJECT_DIST_MED ) ),
         Heuristic( "2a", "3", HeuristicAttack( 100 ) ),
@@ -109,18 +109,13 @@ class BigAlien( WorldObject, Pilot ):
     hLists = \
     [
       [
-        Heuristic( "i", "x", HeuristicGoto( Point( SCREEN_WIDTH * random.uniform( .3, .7 ),
-                                                   random.uniform( shl, shh ) ), OBJECT_DIST_NEAR ) ),
-        Heuristic( "x", None, HeuristicGoto( Point( SCREEN_WIDTH * 1.1,
-                                                    random.uniform( -200, SCREEN_HEIGHT + 200 ) ), OBJECT_DIST_MED ) )
+        Heuristic( "i", "x", HeuristicGoto( Point( SCREEN_WIDTH * random.uniform( .3, .7 ), random.uniform( shl, shh ) ), OBJECT_DIST_NEAR ) ),
+        Heuristic( "x", None, HeuristicGoto( Point( SCREEN_WIDTH * 1.1, random.uniform( -200, SCREEN_HEIGHT + 200 ) ), OBJECT_DIST_MED ) )
       ],
       [
-        Heuristic( "i", "b", HeuristicGoto( Point( SCREEN_WIDTH / 4,
-                                                   random.uniform( shl, shh ) ), OBJECT_DIST_NEAR ) ),
-        Heuristic( "b", "c", HeuristicGoto( Point( SCREEN_WIDTH / 2,
-                                                   random.uniform( SCREEN_HEIGHT * .1, SCREEN_HEIGHT * .9 ) ), OBJECT_DIST_MED ) ),
-        Heuristic( "c", None, HeuristicGoto( Point( SCREEN_WIDTH * 1.5,
-                                                    random.uniform( shl, shh ) ), OBJECT_DIST_MED ) )
+        Heuristic( "i", "b", HeuristicGoto( Point( SCREEN_WIDTH / 4, random.uniform( shl, shh ) ), OBJECT_DIST_NEAR ) ),
+        Heuristic( "b", "c", HeuristicGoto( Point( SCREEN_WIDTH / 2, random.uniform( SCREEN_HEIGHT * .1, SCREEN_HEIGHT * .9 ) ), OBJECT_DIST_MED ) ),
+        Heuristic( "c", None, HeuristicGoto( Point( SCREEN_WIDTH * 1.5, random.uniform( shl, shh ) ), OBJECT_DIST_MED ) )
       ],
       [
         Heuristic( "f", "g", HeuristicFace( random.uniform( -.4, .4 ) ) ), # face right ish
@@ -153,7 +148,7 @@ class BigAlien( WorldObject, Pilot ):
                              Vector( random.random(), TAU * random.random() ).add( self.v ),
                              random.uniform( 30, 50 ),
                              random.uniform( 2, 2.5 ) )
-          e.addObj (p)
+          e.addObj( p )
         t = c.o.type
         if t == OBJECT_TYPE_CANNON or t == OBJECT_TYPE_TORPEDO or t == OBJECT_TYPE_T_CANNON:
           e.score += BIG_ALIEN_POINTS
@@ -165,7 +160,7 @@ class BigAlien( WorldObject, Pilot ):
                          Vector( 2, self.a + PI + random.uniform( -.25, .25 ) ),
                          random.uniform( 5, 10 ),
                          self.accel * random.uniform( 15, 30 ) )
-      e.addObj (p)
+      e.addObj( p )
 
     return True
 
