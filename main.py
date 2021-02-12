@@ -18,7 +18,7 @@ class displayEngine():
   def __init__( self ):
     self.root = Tk()
     self.root.title( "Asteroids" )
-    self.canvas = Canvas( self.root, width = SCREEN_WIDTH, height = SCREEN_HEIGHT )
+    self.canvas = Canvas( self.root, width=SCREEN_WIDTH, height=SCREEN_HEIGHT )
     self.canvas.pack()
     self.highScore = 0
     self.events = gameEvents()
@@ -51,7 +51,7 @@ class displayEngine():
 
   def update( self ):
     # collision detection
-    for i in range( 0, len( self.objects) - 1 ):
+    for i in range( 0, len( self.objects ) - 1 ):
       for j in range( i + 1, len( self.objects ) ):
         obj1 = self.objects[ i ]
         obj2 = self.objects[ j ]
@@ -109,15 +109,15 @@ class displayEngine():
 
     # display the remaining ships
     for s in range( 0, self.numShips ):
-       self.canvas.create_line( 10 + 20 * s, 20, 15 + 20 * s,  5 )
-       self.canvas.create_line( 15 + 20 * s,  5, 20 + 20 * s, 20 )
+      self.canvas.create_line( 10 + 20 * s, 20, 15 + 20 * s,  5, fill="black" )
+      self.canvas.create_line( 15 + 20 * s,  5, 20 + 20 * s, 20, fill="black" )
 
     t = "Score %08s" % self.score
-    self.canvas.create_text( 600, 10, text = t )
+    self.canvas.create_text( 600, 10, text=t, fill="black" )
     t = "High %08s" % self.highScore
-    self.canvas.create_text( 700, 10, text = t )
+    self.canvas.create_text( 700, 10, text=t, fill="black" )
     t = "Wave %d" % self.wave
-    self.canvas.create_text( 350, 10, text = t )
+    self.canvas.create_text( 350, 10, text=t, fill="black" )
 
     self.events.draw( self )
     self.root.update()
@@ -166,7 +166,7 @@ e.root.bind( "<Down>",  downHandler )
 e.root.bind( "<Key>",   keyHandler )
 
 while True:
-  time.sleep( .02 )
+  time.sleep( .01 )
 
   if e.respawn == True:
     e.respawn = False

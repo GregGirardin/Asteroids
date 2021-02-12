@@ -4,7 +4,7 @@ from Vector import *
 
 class WorldObject():
   # Attributes every object has.
-  def __init__( self, type, p, a = 0.0, v= None, colRadius = 0, mass = 1.0, weapon = False ):
+  def __init__( self, type, p, a=0.0, v=None, colRadius=0, mass=1.0, weapon=False ):
     if not v:
       v = Vector( 0, 0 )
     self.v = v
@@ -68,7 +68,7 @@ class gameEvents():
     if len( self.eventList ) > 0:
       ev = self.eventList[ 0 ]
       if ev.msg:
-        e.canvas.create_text( SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text = ev.msg )
+        e.canvas.create_text( SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text=ev.msg, fill="black" )
 
 class spawnAble():
   def __init__( self, min, max, num, ict, newFunc ):

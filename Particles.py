@@ -46,7 +46,7 @@ class CanonParticle( WorldObject ):
       return False
 
   def draw( self, canvas, p, a ):
-    canvas.create_oval( p.x - 1, p.y - 1, p.x + 1, p.y + 1 )
+    canvas.create_oval( p.x - 2, p.y - 2, p.x + 2, p.y + 2, fill="black" )
 
 class Torpedo( WorldObject ):
   def __init__( self, p, v, ttl, radius = 5 ):
@@ -73,7 +73,7 @@ class Torpedo( WorldObject ):
       c = self.colList.pop( 0 )
 
       if c.o.type == OBJECT_TYPE_ASTEROID and c.o.iron == True:
-        self.v.add( c.i, mod = True )
+        self.v.add( c.i, mod=True )
         if self.v.magnitude > SPEED_HI:
           self.v.magnitude = SPEED_HI
         self.p.move( Vector( c.d / 2, c.i.direction ) )
@@ -82,4 +82,4 @@ class Torpedo( WorldObject ):
 
   def draw( self, canvas, p, a ):
     r = self.radius + random.uniform( -2, 1 )
-    canvas.create_oval( p.x - r, p.y - r, p.x + r, p.y + r )
+    canvas.create_oval( p.x - r, p.y - r, p.x + r, p.y + r, fill="black" )

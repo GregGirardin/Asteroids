@@ -41,7 +41,7 @@ class Shape ():
     tlines = self.translate( p, a )
 
     for tline in tlines:
-      canvas.create_line( tline.p1.x, tline.p1.y, tline.p2.x, tline.p2.y, fill = color, width = width )
+      canvas.create_line( tline.p1.x, tline.p1.y, tline.p2.x, tline.p2.y, fill="black", width=width )
 
   def move( self, v ): # v is a vector
     self.p.x += v.magnitude * math.cos( v.direction )

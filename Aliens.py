@@ -2,7 +2,7 @@ from Vector import *
 from Utils import *
 from Particles import *
 from Pilot import *
-import Tkinter as tk # debug
+import tkinter as tk # debug
 
 class SmallAlien( WorldObject, Pilot ):
   def __init__( self ):
@@ -58,7 +58,7 @@ class SmallAlien( WorldObject, Pilot ):
       self.cannon -= 1
       p = CanonParticle( Point( self.p.x + 10 * math.cos( self.a ),
                                 self.p.y - 10 * math.sin( self.a ) ),
-                         Vector( 7, self.a ), 120, type = OBJECT_TYPE_AL_CANNON )
+                         Vector( 7, self.a ), 120, type=OBJECT_TYPE_AL_CANNON )
       e.addObj( p )
 
     while self.colList:
@@ -92,9 +92,9 @@ class SmallAlien( WorldObject, Pilot ):
     self.shape.draw( canvas, p, a )
 
     if debugVectors:
-      canvas.create_line( p.x, p.y, p.x + self.v.dx()  * 20, p.y + self.v.dy()  * 20, arrow = tk.LAST, fill = "green" )
-      canvas.create_line( p.x, p.y, p.x + self.tv.dx() * 20, p.y + self.tv.dy() * 20, arrow = tk.LAST )
-      canvas.create_line( p.x, p.y, p.x + self.cv.dx() * 20, p.y + self.cv.dy() * 20, arrow = tk.LAST, fill = "red" )
+      canvas.create_line( p.x, p.y, p.x + self.v.dx()  * 20, p.y + self.v.dy()  * 20, arrow=tk.LAST, fill = "green" )
+      canvas.create_line( p.x, p.y, p.x + self.tv.dx() * 20, p.y + self.tv.dy() * 20, arrow=tk.LAST )
+      canvas.create_line( p.x, p.y, p.x + self.cv.dx() * 20, p.y + self.cv.dy() * 20, arrow=tk.LAST, fill = "red" )
       canvas.create_oval( self.target.x - 2, self.target.y - 2, self.target.x + 2, self.target.y + 2 )
 
 class BigAlien( WorldObject, Pilot ):
@@ -168,9 +168,9 @@ class BigAlien( WorldObject, Pilot ):
     self.shape.draw( canvas, p, a)
 
     if debugVectors:
-      canvas.create_line( p.x, p.y, p.x + self.v.dx()  * 20, p.y + self.v.dy()  * 20, arrow = tk.LAST, fill = "green" )
-      canvas.create_line( p.x, p.y, p.x + self.tv.dx() * 20, p.y + self.tv.dy() * 20, arrow = tk.LAST )
-      canvas.create_line( p.x, p.y, p.x + self.cv.dx() * 20, p.y + self.cv.dy() * 20, arrow = tk.LAST, fill = "red" )
+      canvas.create_line( p.x, p.y, p.x + self.v.dx()  * 20, p.y + self.v.dy()  * 20, arrow=tk.LAST, fill="green" )
+      canvas.create_line( p.x, p.y, p.x + self.tv.dx() * 20, p.y + self.tv.dy() * 20, arrow=tk.LAST, fill="black" )
+      canvas.create_line( p.x, p.y, p.x + self.cv.dx() * 20, p.y + self.cv.dy() * 20, arrow=tk.LAST, fill="red" )
       canvas.create_oval( self.target.x - 2, self.target.y - 2, self.target.x + 2, self.target.y + 2 )
 
 def newSmallAlien ():

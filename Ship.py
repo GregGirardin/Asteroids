@@ -3,7 +3,7 @@ from Vector import *
 from Shape import *
 from Utils import *
 from Particles import *
-from Tkinter import *
+from tkinter import *
 
 class Ship( WorldObject ):
   def __init__( self ):
@@ -68,10 +68,10 @@ class Ship( WorldObject ):
 
     if self.fireTorpedo is True:
       if self.torpedos > 0:
-        p = Torpedo (Point (self.p.x + 20 * math.cos (self.a),
-                            self.p.y - 20 * math.sin (self.a)),
-                            Vector (7, self.a).add (self.v),
-                            150)
+        p = Torpedo( Point ( self.p.x + 20 * math.cos( self.a ),
+                             self.p.y - 20 * math.sin( self.a ) ),
+                             Vector (7, self.a ).add( self.v ),
+                             150 )
         e.addObj (p)
         self.torpedos -= 10
         self.torpedoDelay = TORPEDO_DELAY
@@ -123,7 +123,7 @@ class Ship( WorldObject ):
 
   def draw( self, canvas, p, a ):
     self.shape.draw (canvas, p, a )
-    canvas.create_rectangle( 100,  5, 100 + 200, 7 )
+    canvas.create_rectangle( 100,  5, 100 + 200, 7,fill="black" )
     fill = "red" if self.fuel < 20.0 else "black"
     canvas.create_rectangle( 100, 10, 100 + 2 * self.fuel, 12, fill=fill )
     fill = "red" if self.rounds < 20.0 else "black"

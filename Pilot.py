@@ -49,7 +49,7 @@ class HeuristicFace():
 
   def update( self, s, e ):
     dirTo = angleTo( s.a, self.hAngle )
-    if math.fabs (dirTo) > .05:
+    if math.fabs( dirTo ) > .05:
       s.spin = dirTo / 20
       return False
     else:
@@ -93,11 +93,11 @@ class HeuristicGoto():
          ( distToTarget < OBJECT_DIST_NEAR ) ) ) ):
       return True
 
-    dirToTarget = s.p.directionTo (self.target)
-    targetVector = Vector (SPEED_HI * 1.5, dirToTarget) # hack. Long vector and drag smooth out ship.
-    correctionVec = vectorDiff (s.v, targetVector) # vector to make our velocity approach targetVector
+    dirToTarget = s.p.directionTo( self.target )
+    targetVector = Vector( SPEED_HI * 1.5, dirToTarget ) # hack. Long vector and drag smooth out ship.
+    correctionVec = vectorDiff( s.v, targetVector ) # vector to make our velocity approach targetVector
 
-    da = angleTo (s.a, correctionVec.direction)
+    da = angleTo( s.a, correctionVec.direction )
 
     s.spin = da / 20
     dp = s.v.dot( correctionVec.direction )
@@ -134,7 +134,7 @@ class HeuristicWait():
     return False
 
 class HeuristicAttack():
-  def __init__( self, duration = 50 ):
+  def __init__( self, duration=50 ):
     self.duration = duration
     self.durationCounter = duration
     self.attackState = ATTACK_INIT
